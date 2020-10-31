@@ -10,5 +10,5 @@ stress = data['(MPa)']
 
 tt.plot_eng_SSC(strain, stress, save = True)
 
-hooke = tt.young_modulus(strain, stress)
+hooke = tt.young_modulus(strain, stress, save = True)
 print(hooke)
