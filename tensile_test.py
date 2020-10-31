@@ -23,27 +23,35 @@ def plot_eng_SSC(strain, stress, save = False):
         plt.xlim(0, 1.05* max(strain))
         plt.ylim(0, 1.05*max(stress))
         plt.show()
+
+
     
-def young_modulus(strain, stress):
+def young_modulus(strain, stress, save = False):
 
-    x = strain
-    y = stress
-    strain = strain[0:2500]
-    stress = stress[0:2500]
-    
-    E, b = [150000, 0]
+    x = strain[strain < 0.002]
+    y = stress[0:len(x)]    
 
-    hooke = Hooke(strain, E, b)
-
-    model = curve_fit(hooke, strain, stress, p0 = (E, b))
+    init_guess = [100000, 0]
+    model = curve_fit(Hooke, x, y, p0 = init_guess)
 
     ans, cov = model
     E, b = ans    
-    fit_curve = E * strain + b
+    fit_curve = E * x + b
+    E_gpa = round(E / 1000)
 
-    plt.figure(figsize = (16,9))
-    plt.plot(x, y, 'b.')
-    plt.plot(strain, fit_curve, 'r-' )
-    plt.show()
+    plt.figure(figsize = (8,4.5))
+    plt.plot(strain, stress, 'b-')
+    plt.plot(x, fit_curve, 'r-', linewidth = 2 )
+    plt.xlabel('strain [mm/mm]')
+    plt.ylabel('stress [MPa]')
+    plt.xlim(0, 1.05* max(strain))
+    plt.ylim(0, 1.05*max(stress))
+    plt.text(0,0, f'The elasticity modulus is {E_gpa} GPa', fontsize=12)  
+    if save == False:     
+        plt.show()
+    else:
+        plt.savefig('output/elasticity', dpi=300, bbox_inches='tight',transparent=False)
+
+        
     return E, int(b)
     

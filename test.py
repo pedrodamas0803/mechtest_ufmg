@@ -8,7 +8,7 @@ data = pd.read_csv('data/am1.csv', sep = ';',
 strain = data['(mm/mm)']
 stress = data['(MPa)']
 
-tt.plot_eng_SSC(strain, stress, save=True)
+tt.plot_eng_SSC(strain, stress, save = True)
 
-# tt.young_modulus(strain, stress)
-# print(E, b)
+hooke = tt.young_modulus(strain, stress)
+print(hooke)
