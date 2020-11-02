@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import scipy as sp 
 from scipy.optimize import curve_fit
-from utils import Hooke
+from utils import Hooke, r_squared
 
 
 def plot_eng_SSC(strain, stress, save = False):
@@ -34,11 +34,7 @@ def young_modulus(strain, stress, save = False):
     E_gpa = round(E / 1000)
     
 # calculating the R_squared statistic
-    res = y - Hooke(x, *ans)
-    ss_res = np.sum(res ** 2)
-    ss_tot = np.sum((y - np.mean(y)) ** 2)
-    r_squared = 1 - (ss_res/ss_tot)   
-
+    r2 = r_squared(x, y, Hooke, ans)
 # plotting the figure and showing or saving the figure
     plt.figure(figsize = (8,4.5))
     plt.plot(strain, stress, 'b-')
@@ -47,12 +43,46 @@ def young_modulus(strain, stress, save = False):
     plt.ylabel('stress [MPa]')
     plt.xlim(0, 1.05* max(strain))
     plt.ylim(0, 1.05*max(stress))
-    plt.text(0.1*max(strain), 0.1*max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r_squared, 4)}', fontsize=12)  
+    plt.text(0.1*max(strain), 0.1*max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize=12)  
 
     if save != False:     
         plt.savefig('output/elasticity', dpi=300, bbox_inches='tight',transparent=False)
     else:
         plt.show()
     
-    return E, int(b), r_squared
+    return E, int(b), r2
+
+def sigma_y(strain, stress, E_mpa, b, save = False):
+    # taking part of the data
+    x = strain[strain < 0.005]
+    k = x - 0.002
+    z = Hooke(k, E_mpa)
+    # finding the index of sig_y
+    i = 0
+    while stress[i] > z[i]:
+        i = i + 1 
+
+    sig_y = stress[i]
+
+
+    plt.figure(figsize = (8,4.5))
+    plt.plot(strain, stress, 'b-')
+    plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1 )
+    plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
+    plt.xlabel('strain [mm/mm]')
+    plt.ylabel('stress [MPa]')
+    plt.xlim(0, 1.05* max(strain))
+    plt.ylim(0, 1.05*max(stress))
+    plt.text(0.1*max(strain), 0.1*max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize=12)
+
+    if save != False:     
+        plt.savefig('output/sigma_yield', dpi=300, bbox_inches='tight',transparent=False)
+    else:
+        plt.show()
+    
+    print(f'The yield strength is {round(sig_y)} MPa.')
+    return sig_y
+
+def UTS(strain, stress):
+    return max(stress)
     

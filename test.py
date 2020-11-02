@@ -11,4 +11,9 @@ stress = data['(MPa)']
 tt.plot_eng_SSC(strain, stress, save = True)
 
 hooke = tt.young_modulus(strain, stress, save = True)
-print(hooke)
+
+tt.sigma_y(strain, stress, hooke[0], hooke[1], save = True)
+# print(hooke)
+
+uts = tt.UTS(strain, stress)
+print(uts)
