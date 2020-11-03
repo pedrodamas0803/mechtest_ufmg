@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
-import scipy as sp
+from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
-from utils import Hooke, r_squared
+from utils import Hooke, r_squared, find_index
 
 
 def plot_eng_SSC(strain, stress, save = False):
@@ -60,28 +60,28 @@ def sigma_y(strain, stress, E_mpa, b = 0, show_plot = True, save = False):
     k = x - 0.002
     z = Hooke(k, E_mpa)
     # finding the index of sig_y
+                                        # TODO: replace find_index
     i = 0
     while stress[i] > z[i]:
         i = i + 1
 
-    sig_y = stress[i]
-
-    if show_plot == True:
+    sig_y = stress[i]  
             
-        plt.figure(figsize = (8,4.5))
-        plt.plot(strain, stress, 'b-')
-        plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1 )
-        plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
-        plt.xlabel('strain [mm/mm]')
-        plt.ylabel('stress [MPa]')
-        plt.xlim(0, 1.05* max(strain))
-        plt.ylim(0, 1.05*max(stress))
-        plt.text(0.1*max(strain), 0.1*max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize=12)
+    plt.figure(figsize = (8,4.5))
+    plt.plot(strain, stress, 'b-')
+    plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1 )
+    plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
+    plt.xlabel('strain [mm/mm]')
+    plt.ylabel('stress [MPa]')
+    plt.xlim(0, 1.05* max(strain))
+    plt.ylim(0, 1.05*max(stress))
+    plt.text(0.1*max(strain), 0.1*max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize=12)
 
-        if save != False:
-            plt.savefig('output/sigma_yield', dpi=300, bbox_inches='tight',transparent=False)
-        else:
-            plt.show()
+    if save == True:
+        plt.savefig('output/sigma_yield', dpi=300, bbox_inches='tight',transparent=False)
+    
+    if show_plot== True:
+        plt.show()
 
     print(f'The yield strength is {round(sig_y)} MPa.')
     return sig_y
@@ -123,7 +123,42 @@ def aprox_toughness(strain, sig_y, uts, show = True):
     U_t = eps_f * ((sig_y + uts) / 2)
     
     if show == True:
-        print(f'The materials toughness is approximately {round(U_t)} MJ/m³.')
+        print(f'The material toughness is approximately {round(U_t)} MJ/m³.')
     return U_t 
 
 
+def toughness(strain, stress, show = True):
+
+    mat_toughness = trapz(stress, strain)
+
+    if show == True:
+        print(f'The material toughness computed by Trapezoidal method is {round(mat_toughness)} MJ/m³. ')
+    return mat_toughness
+
+def plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save = False):
+                                                    # TODO: deal with discontinuous yielding; how can I determine where it ends?
+    eps = strain.to_numpy()
+    sig = stress.to_numpy()
+
+    yield_index = find_index(sig, sig_y)
+    uts_index = find_index(sig, uts)
+
+    eps_c = eps[yield_index:uts_index]
+    sig_c = sig[yield_index:uts_index]
+
+    plt.figure(figsize = (8,4.5))
+    plt.plot(eps_c, sig_c, 'b-')
+    plt.xlabel('strain [mm/mm]')
+    plt.ylabel('stress [MPa]')
+    plt.xlim(0, 1.05* max(strain))
+    plt.ylim(0, 1.05*max(stress))
+
+    if show_plot == True:
+        plt.show()
+
+    if save == True:
+        plt.savefig('output/flow_curve', dpi=300, bbox_inches='tight',transparent=False)
+
+def flow_model(strain, stress, func, *func_params):
+    pass
+    
