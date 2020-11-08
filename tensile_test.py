@@ -107,14 +107,27 @@ def uniform_elong(strain, stress, show = True):
 
     return u_elong
 
-def resilience(E, sig_y, show = True):
+def aprox_resilience(E, sig_y, show = True):
 
     U_r = (sig_y ** 2)/(2*E)
 
     if show == True:
-        print(f'The resilience is {round(U_r,2)} MJ/m³. ')
+        print(f'The resilience calculated by the formula yield²/2E is {round(U_r,2)} MJ/m³. ')
 
     return U_r
+
+def resilience(strain, stress, sig_y, dx = 1.0, show = True):
+    
+    i = find_index(stress, sig_y)
+    eps = strain[0:i]
+    sig = stress[0:i]
+    U_r = trapz(eps, sig, dx)
+
+    if show == True:
+        print(f'The resilience calculated by trapezoidal integration with dx = {dx} is {round(U_r,2)} MJ/m³. ')
+
+    return U_r
+
 
 def aprox_toughness(strain, sig_y, uts, show = True):
 
@@ -150,8 +163,8 @@ def plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save = False):
     plt.plot(eps_c, sig_c, 'b-')
     plt.xlabel('strain [mm/mm]')
     plt.ylabel('stress [MPa]')
-    plt.xlim(0, 1.05* max(strain))
-    plt.ylim(0, 1.05*max(stress))
+    plt.xlim(0, 1.05* max(eps_c))
+    plt.ylim(0.95 * sig_c[0], 1.05* max(sig_c))
 
     if show_plot == True:
         plt.show()

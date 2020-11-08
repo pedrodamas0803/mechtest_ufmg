@@ -40,7 +40,7 @@ def true_values(strain, stress, sig_y, uts):
     return eps_t, sig_t
 
 
-def log_Hollomon(strain, stress, K = 0.25, N = 300):
+def log_Hollomon(strain, K = 300, N = 0.25):
     
     return np.log(K) + N * np.log(strain)
     
