@@ -8,7 +8,7 @@ data = pd.read_csv('data/am1.csv', sep = ';',
 strain = data['(mm/mm)']
 stress = data['(MPa)']
 
-# tt.plot_eng_SSC(strain, stress, save = True)
+tt.plot_eng_SSC(strain, stress, show_plot = False, save = True)
 
 hooke = tt.young_modulus(strain, stress, show_plot = False, save = True)
 # print(hooke)
@@ -29,6 +29,8 @@ tt.aprox_toughness(strain, sig_y, uts, show = True)
 
 tt.toughness(strain, stress, show = True)
 
-tt.plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save= True)
+tt.plot_flow_curve(strain, stress, sig_y, uts, show_plot = False, save = True)
+
+tt.plot_true_SSC(strain, stress, sig_y, uts, show_plot = False, save = True)
 
 # print(eps_u)
