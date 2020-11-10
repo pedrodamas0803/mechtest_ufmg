@@ -3,8 +3,10 @@ import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
 from mechtest_ufmg.Utils import *
+import os
 
-def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save = False, name = 'eng_SSC'):
+def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True,
+                 save = False, name = 'eng_SSC', ):
         
         plt.figure(figsize=(8, 4.5), facecolor = 'white')
         plt.plot(strain, stress, 'b-', label = fig_label)
@@ -16,7 +18,8 @@ def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save =
         plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
 
         if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight',transparent = False)
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
         
         if show_plot == True:
             plt.show()
@@ -53,7 +56,9 @@ def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save =
         plt.text(0.1 * max(strain), 0.1 * max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
 
         if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
+
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)        
         
         if show_plot == True:
             plt.show()
@@ -86,8 +91,10 @@ def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True
         plt.text(0.1 * max(strain), 0.1 * max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize = 12)
 
         if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
-        
+
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+
         if show_plot == True:
             plt.show()
 
@@ -185,7 +192,9 @@ def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot 
             plt.show()
 
         if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
+
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
 def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
 
@@ -201,13 +210,15 @@ def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = 
         plt.title(f'True stress/strain curve')
         plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
         
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+
 
         if show_plot == True:
+
             plt.show()
-
-        if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
-
 
 def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 
@@ -238,12 +249,16 @@ def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_
         plt.legend(fontsize = 12, loc = 'lower right', frameon = False)        
 
         if show_plot == True:
+
             plt.show()
 
         if save == True:
-            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
-
+            
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+            
         if show == True:
+
             print(f'The resistance modulus is {round(Koeff)} MPa and the strain-hardening exponent is {round(shex, 2)}.')
 
         return shex, Koeff
