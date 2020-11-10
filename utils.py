@@ -36,17 +36,17 @@ def uniform_plast(strain, stress, sig_y, uts):
 
         return eps_c, sig_c
 
-def true_values(strain, stress, sig_y, uts):
+def true_values(strain, stress,):
     
-        eps, sig = uniform_plast(strain, stress, sig_y, uts)
+        # eps, sig = uniform_plast(strain, stress, sig_y, uts)
         
-        eps_t = np.log(1 + eps)
-        sig_t = sig * (1 + eps)
+        eps_t = np.log(1 + strain)
+        sig_t = stress * (1 + strain)
 
         return eps_t, sig_t
 
 
-def log_Hollomon(strain, K = 300, N = 0.25):
-    
-    return np.log(K) + N * np.log(strain)
-    
+def log_Hollomon(log_strain, K = 300, n = 0.25):
+        logK = np.log(K)
+        return logK + n * log_strain
+        

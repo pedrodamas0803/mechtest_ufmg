@@ -5,14 +5,16 @@ from scipy.optimize import curve_fit
 from utils import *
 
 
-def plot_eng_SSC(strain, stress, show_plot = True, save = False):
+def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save = False):
         
         plt.figure(figsize=(8, 4.5), facecolor = 'white')
-        plt.plot(strain, stress, 'b-')
+        plt.plot(strain, stress, 'b-', label = fig_label)
         plt.xlabel('strain [mm/mm]')
         plt.ylabel('stress [MPa]')
         plt.xlim(0, 1.05 * max(strain))
         plt.ylim(0, 1.05 * max(stress))
+        plt.title(f'Engineering stress/strain curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
 
         if save == True:
             plt.savefig('output/eng_SSC', dpi = 300, bbox_inches = 'tight',transparent = False)
@@ -22,7 +24,7 @@ def plot_eng_SSC(strain, stress, show_plot = True, save = False):
 
 
 
-def young_modulus(strain, stress, show_plot = True, save = False):
+def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save = False):
 
     # taking only the elastic portion of a curve
         x = strain[strain < 0.002]
@@ -38,26 +40,28 @@ def young_modulus(strain, stress, show_plot = True, save = False):
     # calculating the R_squared statistic
         r2 = r_squared(x, y, Hooke, ans)
 
-        if show_plot == True:
-        # plotting the figure and showing or saving the figure
-            plt.figure(figsize = (8,4.5))
-            plt.plot(strain, stress, 'b-')
-            plt.plot(x, fit_curve, 'r-', linewidth = 2 )
-            plt.xlabel('strain [mm/mm]')
-            plt.ylabel('stress [MPa]')
-            plt.xlim(0, 1.05* max(strain))
-            plt.ylim(0, 1.05 * max(stress))
-            plt.text(0.1 * max(strain), 0.1 * max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
+        
+    # plotting the figure and showing or saving the figure
+        plt.figure(figsize = (8,4.5))
+        plt.plot(strain, stress, 'b-', label = fig_label)
+        plt.plot(x, fit_curve, 'r-', linewidth = 2, label = 'Fitted curve' )
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel('stress [MPa]')
+        plt.xlim(0, 1.05* max(strain))
+        plt.ylim(0, 1.05 * max(stress))
+        plt.title(f'Elasticity modulus determination')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        plt.text(0.1 * max(strain), 0.1 * max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
 
-            if save == True:
-                plt.savefig('output/elasticity', dpi = 300, bbox_inches = 'tight', transparent = False)
-            
-            if show_plot == True:
-                plt.show()
+        if save == True:
+            plt.savefig('output/elasticity', dpi = 300, bbox_inches = 'tight', transparent = False)
+        
+        if show_plot == True:
+            plt.show()
 
         return E, int(b), r2
 
-def sigma_y(strain, stress, E_mpa, b = 0, show_plot = True, save = False):
+def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True, save = False):
         # taking part of the data
         x = strain[strain < 0.005]
         k = x - 0.002
@@ -71,13 +75,15 @@ def sigma_y(strain, stress, E_mpa, b = 0, show_plot = True, save = False):
         sig_y = stress[i]  
                 
         plt.figure(figsize = (8,4.5))
-        plt.plot(strain, stress, 'b-')
-        plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1 )
+        plt.plot(strain, stress, 'b-', label = fig_label)
+        plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1, label = 'Hooke\'s law' )
         plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
         plt.xlabel('strain [mm/mm]')
         plt.ylabel('stress [MPa]')
         plt.xlim(0, 1.05 * max(strain))
         plt.ylim(0, 1.05 * max(stress))
+        plt.title(f'Yield strength determination')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
         plt.text(0.1 * max(strain), 0.1 * max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize = 12)
 
         if save == True:
@@ -156,7 +162,7 @@ def toughness(strain, stress, show = True):
         
         return mat_toughness
 
-def plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save = False):
+def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False):
                                                     # TODO: deal with discontinuous yielding; how can I determine where it ends?
         eps = strain.to_numpy()
         sig = stress.to_numpy()
@@ -168,11 +174,13 @@ def plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save = False):
         sig_c = sig[yield_index:uts_index]
 
         plt.figure(figsize = (8,4.5))
-        plt.plot(eps_c, sig_c, 'b-')
+        plt.plot(eps_c, sig_c, 'b-', label = fig_label)
         plt.xlabel('strain [mm/mm]')
         plt.ylabel('stress [MPa]')
         plt.xlim(0, 1.05 * max(strain))
         plt.ylim(0, 1.05 * max(stress))
+        plt.title(f'Flow stress curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
 
         if show_plot == True:
             plt.show()
@@ -180,16 +188,20 @@ def plot_flow_curve(strain, stress, sig_y, uts, show_plot = True, save = False):
         if save == True:
             plt.savefig('output/flow_curve', dpi = 300, bbox_inches = 'tight', transparent = False)
 
-def plot_true_SSC(strain, stress, sig_y, uts, show_plot = True, save = False):
+def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False):
 
-        eps_t, sig_t = true_values(strain, stress, sig_y, uts)
+        eps, sig = uniform_plast(strain, stress, sig_y, uts)
+        eps_t, sig_t = true_values(eps, sig)
 
         plt.figure(figsize = (8,4.5))
-        plt.plot(eps_t, sig_t, 'b-')
+        plt.plot(eps_t, sig_t, 'b-', label = fig_label)
         plt.xlabel('true strain [mm/mm]')
         plt.ylabel('true stress [MPa]')
         plt.xlim(0, 1.05 * max(eps_t))
         plt.ylim(0, 1.05 * max(sig_t))
+        plt.title(f'True stress/strain curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        
 
         if show_plot == True:
             plt.show()
@@ -198,11 +210,41 @@ def plot_true_SSC(strain, stress, sig_y, uts, show_plot = True, save = False):
             plt.savefig('output/true_SSC', dpi = 300, bbox_inches = 'tight', transparent = False)
 
 
+def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False):
 
+        eps_c, sig_c = uniform_plast(strain, stress, sig_y, uts)
 
+        eps_t, sig_t = true_values(eps_c, sig_c)
 
+        eps_tl = np.log(eps_t)
+        sig_tl = np.log(sig_t)
 
-# def flow_model(strain, stress, func, *func_params):
-    
-#         log_strain
-    
+        init_guess = [300, 0.25]
+
+        ans, cov = curve_fit(log_Hollomon, eps_tl, sig_tl, p0 = init_guess)
+
+        Koeff = ans[0]
+        shex = ans[1]
+
+        sig_h = log_Hollomon(eps_tl, K = Koeff, n = shex)
+
+        R2 = r_squared(eps_tl, sig_tl, log_Hollomon, ans)
+
+        plt.figure(figsize = (8,4.5))
+        plt.plot(eps_tl, sig_tl, 'b-', label = 'Stress-Strain log values')
+        plt.plot(eps_tl, sig_h, 'r:', label = f'Linear Hollomon, K = {round(Koeff)} MPa, n = {round(shex, 2)}, R²={round(R2, 4)}')
+        plt.xlabel('log(strain) [mm/mm]')
+        plt.ylabel('log(stress) [MPa]')
+        plt.title(f'{func} fitted to the data')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)        
+
+        if show_plot == True:
+            plt.show()
+
+        if save == True:
+            plt.savefig('output/flow_model', dpi = 300, bbox_inches = 'tight', transparent = False)
+
+        if show == True:
+            print(f'The resistance modulus is {round(Koeff)} MPa and the strain-hardening exponent is {round(shex, 2)}.')
+
+        return shex, Koeff
