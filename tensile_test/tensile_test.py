@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
-from utils import *
+from tensile_test import utils
 
 
-def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save = False):
+def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save = False, name = 'eng_SSC'):
         
         plt.figure(figsize=(8, 4.5), facecolor = 'white')
         plt.plot(strain, stress, 'b-', label = fig_label)
@@ -17,14 +17,14 @@ def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save =
         plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
 
         if save == True:
-            plt.savefig('output/eng_SSC', dpi = 300, bbox_inches = 'tight',transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight',transparent = False)
         
         if show_plot == True:
             plt.show()
 
 
 
-def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save = False):
+def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save = False, name = 'elasticity'):
 
     # taking only the elastic portion of a curve
         x = strain[strain < 0.002]
@@ -54,16 +54,16 @@ def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save =
         plt.text(0.1 * max(strain), 0.1 * max(stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
 
         if save == True:
-            plt.savefig('output/elasticity', dpi = 300, bbox_inches = 'tight', transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
         
         if show_plot == True:
             plt.show()
 
         return E, int(b), r2
 
-def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True, save = False):
+def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True, save = False, name = 'sigma_yield'):
         # taking part of the data
-        x = strain[strain < 0.005]
+        x = strain[strain < 0.05]
         k = x - 0.002
         z = Hooke(k, E_mpa)
         # finding the index of sig_y
@@ -87,7 +87,7 @@ def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True
         plt.text(0.1 * max(strain), 0.1 * max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize = 12)
 
         if save == True:
-            plt.savefig('output/sigma_yield', dpi = 300, bbox_inches = 'tight', transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
         
         if show_plot == True:
             plt.show()
@@ -162,7 +162,7 @@ def toughness(strain, stress, show = True):
         
         return mat_toughness
 
-def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False):
+def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'flow_curve'):
                                                     # TODO: deal with discontinuous yielding; how can I determine where it ends?
         eps = strain.to_numpy()
         sig = stress.to_numpy()
@@ -186,9 +186,9 @@ def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot 
             plt.show()
 
         if save == True:
-            plt.savefig('output/flow_curve', dpi = 300, bbox_inches = 'tight', transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
 
-def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False):
+def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
 
         eps, sig = uniform_plast(strain, stress, sig_y, uts)
         eps_t, sig_t = true_values(eps, sig)
@@ -207,10 +207,10 @@ def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = 
             plt.show()
 
         if save == True:
-            plt.savefig('output/true_SSC', dpi = 300, bbox_inches = 'tight', transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
 
 
-def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False):
+def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 
         eps_c, sig_c = uniform_plast(strain, stress, sig_y, uts)
 
@@ -242,9 +242,12 @@ def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_
             plt.show()
 
         if save == True:
-            plt.savefig('output/flow_model', dpi = 300, bbox_inches = 'tight', transparent = False)
+            plt.savefig(f'output/{name}', dpi = 300, bbox_inches = 'tight', transparent = False)
 
         if show == True:
             print(f'The resistance modulus is {round(Koeff)} MPa and the strain-hardening exponent is {round(shex, 2)}.')
 
         return shex, Koeff
+
+
+        
