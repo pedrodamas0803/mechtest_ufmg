@@ -2,8 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
-from tensile_test import utils
-
+from mechtest_ufmg.Utils import *
 
 def plot_eng_SSC(strain, stress, fig_label = 'Sample ', show_plot = True, save = False, name = 'eng_SSC'):
         
