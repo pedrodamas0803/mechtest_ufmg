@@ -31,6 +31,7 @@ def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save =
     # taking only the elastic portion of a curve
         x = strain[strain < 0.002]
         y = stress[0:len(x)]
+
     # performing the linear regression on the elastic part of the data
         init_guess = [100000, 0]
         model = curve_fit(Hooke, x, y, p0 = init_guess)
@@ -41,7 +42,6 @@ def young_modulus(strain, stress, fig_label = 'Sample', show_plot = True, save =
 
     # calculating the R_squared statistic
         r2 = r_squared(x, y, Hooke, ans)
-
         
     # plotting the figure and showing or saving the figure
         plt.figure(figsize = (8,4.5))
@@ -71,7 +71,6 @@ def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True
         k = x - 0.002
         z = Hooke(k, E_mpa)
         # finding the index of sig_y
-                                            # TODO: replace find_index
         i = 0
         while stress[i] > z[i]:
             i = i + 1
@@ -102,7 +101,7 @@ def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True
         
         return sig_y
 
-def UTS(strain, stress, show = True):
+def ultimate_tens_stren(strain, stress, show = True):
         
         uts = max(stress)
         if show == True:
@@ -110,8 +109,8 @@ def UTS(strain, stress, show = True):
     
         return uts
 
-def uniform_elong(strain, stress, show = True):
-# transform data to numpy arrays
+def uniform_elongation(strain, stress, show = True):
+    # transform data to numpy arrays
         eps = strain.to_numpy()
         sig = stress.to_numpy()
 
@@ -119,7 +118,7 @@ def uniform_elong(strain, stress, show = True):
         index = np.argmax(sig)
         u_elong = eps[index]
 
-# prints depending on the user's choice
+    # prints depending on the user's choice
         if show == True:
             print(f'The uniform elongation is {round(u_elong, 4)}.')
 
