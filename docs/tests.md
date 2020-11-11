@@ -147,7 +147,7 @@ plot_eng_SSC(strain, stress, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_11_0.png)
+![png](output_11_0.png)
     
 
 
@@ -162,7 +162,7 @@ E, b, R2 = young_modulus(strain, stress, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_13_0.png)
+![png](output_13_0.png)
     
 
 
@@ -177,7 +177,7 @@ sig_y = sigma_y(strain, stress, E, b, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_15_0.png)
+![png](output_15_0.png)
     
 
 
@@ -256,7 +256,7 @@ plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_27_0.png)
+![png](output_27_0.png)
     
 
 
@@ -271,7 +271,7 @@ plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_29_0.png)
+![png](output_29_0.png)
     
 
 
@@ -287,6 +287,6 @@ n, K = flow_model(strain, stress, sig_y, uts, show_plot = False, save = True, na
 
 
     
-![png](docs/output_31_1.png)
+![png](output_31_1.png)
     
 
