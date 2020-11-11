@@ -101,7 +101,7 @@ def sigma_y(strain, stress, E_mpa, b = 0, fig_label = 'Sample', show_plot = True
         
         return sig_y
 
-def ultimate_tens_stren(strain, stress, show = True):
+def UTS(strain, stress, show = True):
         
         uts = max(stress)
         if show == True:
@@ -109,7 +109,7 @@ def ultimate_tens_stren(strain, stress, show = True):
     
         return uts
 
-def uniform_elongation(strain, stress, show = True):
+def uniform_elong(strain, stress, show = True):
     # transform data to numpy arrays
         eps = strain.to_numpy()
         sig = stress.to_numpy()

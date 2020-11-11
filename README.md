@@ -1,6 +1,6 @@
 # mechtest_ufmg: Mechanical Testing Analysis 
 
-This library is being developed to assist the students of the course of Mechanical and microstructural characterization of metals. Its content is prepared to guide throughout the lectures and to help the students in the studying process. 
+This library is being developed to assist the students of the course of Mechanical and microstructural characterization of metals. Its content is prepared to guide throughout the lectures and to help the students in the learning process. 
 
 The course is offered as an elective discipline for the Metallurgical and Materials Engineering students, and is taught at the School of Engineering of the Federal University of Minas Gerais. 
 
@@ -64,68 +64,13 @@ import pandas as pd                     # Importing pandas to read the data
 data = pd.read_csv('data/astm1055.tsv', sep = '\t', decimal = ',')
 ```
 
+If you want to check if your data was imported and parsed correctly you can use `data.head()`.
+
 
 ```python
 ##### Just checking....
-data.head()
+# data.head()
 ```
-
-
-
-
-<div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
-<table border="1" class="dataframe">
-  <thead>
-    <tr style="text-align: right;">
-      <th></th>
-      <th>Strain</th>
-      <th>Stress</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th>0</th>
-      <td>0.0</td>
-      <td>0.27843</td>
-    </tr>
-    <tr>
-      <th>1</th>
-      <td>0.0</td>
-      <td>0.39128</td>
-    </tr>
-    <tr>
-      <th>2</th>
-      <td>0.0</td>
-      <td>0.51952</td>
-    </tr>
-    <tr>
-      <th>3</th>
-      <td>0.0</td>
-      <td>0.63649</td>
-    </tr>
-    <tr>
-      <th>4</th>
-      <td>0.0</td>
-      <td>0.74949</td>
-    </tr>
-  </tbody>
-</table>
-</div>
-
-
 
 ##### Extracting the dataframe columns into series with our data
 
@@ -147,7 +92,7 @@ plot_eng_SSC(strain, stress, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_11_0.png)
+![svg](img/output_12_0.svg)
     
 
 
@@ -162,7 +107,7 @@ E, b, R2 = young_modulus(strain, stress, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_13_0.png)
+![svg](img/output_14_0.svg)
     
 
 
@@ -177,22 +122,32 @@ sig_y = sigma_y(strain, stress, E, b, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_15_0.png)
+![svg](img/output_16_0.svg)
     
 
 
     The yield strength is 566 MPa.
 
 
-### Using `ultimate_tens_stren()` to calculate the ultimate tensile strength $UTS$ or $\sigma_R$
+### Using `UTS()` to calculate the ultimate tensile strength $UTS$ or $\sigma_R$
 
 
 
 ```python
-uts = ultimate_tens_stren(strain, stress, show = True)
+uts = UTS(strain, stress, show = True)
 ```
 
     The ultimate tensile strength is 940 MPa. 
+
+
+### Using `uniform_elong()` to calculate the uniform elongation.
+
+
+```python
+uniform_e = uniform_elong(strain, stress, show = True)
+```
+
+    The uniform elongation is 0.1086.
 
 
 ### Calculating the resilience $U_r$ using an approximate mathematical formula and numerical integration
@@ -256,7 +211,7 @@ plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_27_0.png)
+![svg](img/output_30_0.svg)
     
 
 
@@ -271,7 +226,7 @@ plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'ASTM 1055',
 
 
     
-![png](docs/output_29_0.png)
+![svg](img/output_32_0.svg)
     
 
 
@@ -287,6 +242,6 @@ n, K = flow_model(strain, stress, sig_y, uts, show_plot = False, save = True, na
 
 
     
-![png](docs/output_31_1.png)
+![svg](img/output_34_1.svg)
     
 
