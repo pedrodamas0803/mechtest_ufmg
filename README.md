@@ -184,12 +184,12 @@ sig_y = sigma_y(strain, stress, E, b, fig_label = 'ASTM 1055',
     The yield strength is 566 MPa.
 
 
-### Using `UTS()` to calculate the ultimate tensile strength $UTS$ or $\sigma_R$
+### Using `ultimate_tens_stren()` to calculate the ultimate tensile strength $UTS$ or $\sigma_R$
 
 
 
 ```python
-uts = UTS(strain, stress, show = True)
+uts = ultimate_tens_stren(strain, stress, show = True)
 ```
 
     The ultimate tensile strength is 940 MPa. 
