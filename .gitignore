@@ -1,4 +1,9 @@
 isItUseful.py
-.vscode
-.ipynb_checkpoints
+/*.vscode
+/*.ipynb_checkpoints
+/*__pycache__
+/tests/*ipynb_checkpoints
+/*egg-info
+/build
+/dist
 
