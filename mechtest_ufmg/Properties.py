@@ -203,7 +203,17 @@ def uniform_elongation(strain, stress, show = True):
 def aprox_resilience(E, sig_y, show = True):
 
     '''
-    Calculates the resilience by the approximation formula U_r = sigma_yield^2/E
+    Calculates the resilience by the approximation formula U_r = sigma_yield^2/E.
+
+    Inputs:
+    E - the apparent elasticity modulus, in MPa.
+    sig_y - the yield strength, in MPa
+    show - default = True; if True prints a string containing the calculated value.
+
+    Output:
+
+    U_r - the resilience calculated by the presented formula.
+
     '''
 
     U_r = (sig_y ** 2)/(2*E)
@@ -214,133 +224,193 @@ def aprox_resilience(E, sig_y, show = True):
     return U_r
 
 def resilience(strain, stress, sig_y, dx = 1.0, show = True):
+
+    '''
+    Calculates the resilience by numerical integration using the trapezoidal method up to the yield stregth point.
+
+    Inputs:
+    strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
+    stress - vector containing the stress data relative to the strain vector.
+    sig_y - the yield strength in MPa.
+    dx - default = 1.0; the step size for the integration.
+    show - default = True; if true, prints the value of UTS in the command line.
+
+    Output:
+
+    uts - the ultimate tensile strength in the same unit of the stress input.
+
+    '''
     
-        i = find_index(stress, sig_y)
-        eps = strain[0:i]
-        sig = stress[0:i]
-        U_r = trapz(eps, sig, dx)
+    i = find_index(stress, sig_y)
+    eps = strain[0:i]
+    sig = stress[0:i]
+    U_r = trapz(eps, sig, dx)
 
-        if show == True:
-            print(f'The resilience calculated by trapezoidal integration with dx = {dx} is {round(U_r,2)} MJ/m³. ')
+    if show == True:
+        print(f'The resilience calculated by trapezoidal integration with dx = {dx} is {round(U_r,2)} MJ/m³. ')
 
-        return U_r
+    return U_r
 
 
 def aprox_toughness(strain, sig_y, uts, show = True):
 
-        eps_f = max(strain)
+    '''
+    Calculates an approximation of the toughness using the formula U_t = eps_f * ((sig_y + uts)/2).
 
-        U_t = eps_f * ((sig_y + uts) / 2)
-        
-        if show == True:
-            print(f'The material toughness is approximately {round(U_t)} MJ/m³.')
+    Inputs:
+
+    strain - the vector containing the strain values from the test.
+    sig_y - the yield strength, in MPa
+    uts - the ultimate tensile strength, in MPa
+    show - default = True; if True prints the string containing the material toughness. 
+
+    Output:
+
+    U_t - the approximate toughness of the material
+    '''
+
+    eps_f = max(strain)
+
+    U_t = eps_f * ((sig_y + uts) / 2)
     
-        return U_t 
+    if show == True:
+        print(f'The material toughness is approximately {round(U_t)} MJ/m³.')
+
+    return U_t 
 
 
 def toughness(strain, stress, show = True):
 
-        mat_toughness = trapz(stress, strain)
+    '''
+    Calculates the toughness of the material performing the numerical integration of the stress-strain curve.
 
-        if show == True:
-            print(f'The material toughness computed by Trapezoidal method is {round(mat_toughness)} MJ/m³. ')
-        
-        return mat_toughness
+    Inputs:
+
+    strain - the vector containing the strain values obtained from the tests.
+    stress - the vector containing the stress values that refer to the strain vector.
+    show - default = True; if True prints a string containing the toughness in the command line.
+
+    Output:
+
+    mat_toughness - the material toughness calculated by numerical integration, in MJ/m³.
+    '''
+
+    mat_toughness = trapz(stress, strain)
+
+    if show == True:
+        print(f'The material toughness computed by Trapezoidal method is {round(mat_toughness)} MJ/m³. ')
+    
+    return mat_toughness
 
 def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'flow_curve'):
                                                     # TODO: deal with discontinuous yielding; how can I determine where it ends?
-        eps = strain.to_numpy()
-        sig = stress.to_numpy()
 
-        yield_index = find_index(sig, sig_y)
-        uts_index = find_index(sig, uts)
+    '''
+    Plots the flow stress curve from the material stress-strain curve with values between the yield strength and the ultimate tensile strength.
 
-        eps_c = eps[yield_index:uts_index]
-        sig_c = sig[yield_index:uts_index]
+    Inputs:
 
-        plt.figure(figsize = (8,4.5))
-        plt.plot(eps_c, sig_c, 'b-', label = fig_label)
-        plt.xlabel('strain [mm/mm]')
-        plt.ylabel('stress [MPa]')
-        plt.xlim(0, 1.05 * max(strain))
-        plt.ylim(0, 1.05 * max(stress))
-        plt.title(f'Flow stress curve')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+    strain - the vector containing the strain values obtained from the tests.
+    stress - the vector containing the stress values that refer to the strain vector.
+    sig_y - the yield strength, in MPa.
+    uts - the ultimate tensile strength, in MPa.
+    fig_label - default = Sample; the string that identify the sample name in the output figure.
+    show_plot - default = True; if True, the plot is shown in a matplotlib interface.
+    save - default = False, if True, saves the figure in the folder output;
+    name - default = flow_curve; the name of the file saved in the output folder.
+    '''
+    eps = strain.to_numpy()
+    sig = stress.to_numpy()
 
-        if show_plot == True:
-            plt.show()
+    yield_index = find_index(sig, sig_y)
+    uts_index = find_index(sig, uts)
 
-        if save == True:
+    eps_c = eps[yield_index:uts_index]
+    sig_c = sig[yield_index:uts_index]
 
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+    plt.figure(figsize = (8,4.5))
+    plt.plot(eps_c, sig_c, 'b-', label = fig_label)
+    plt.xlabel('strain [mm/mm]')
+    plt.ylabel('stress [MPa]')
+    plt.xlim(0, 1.05 * max(strain))
+    plt.ylim(0, 1.05 * max(stress))
+    plt.title(f'Flow stress curve')
+    plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+
+    if show_plot == True:
+        plt.show()
+
+    if save == True:
+
+        save_path = os.path.abspath(os.path.join('output', name))
+        plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
 def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
 
-        eps, sig = uniform_plast(strain, stress, sig_y, uts)
-        eps_t, sig_t = true_values(eps, sig)
+    eps, sig = uniform_plast(strain, stress, sig_y, uts)
+    eps_t, sig_t = true_values(eps, sig)
 
-        plt.figure(figsize = (8,4.5))
-        plt.plot(eps_t, sig_t, 'b-', label = fig_label)
-        plt.xlabel('true strain [mm/mm]')
-        plt.ylabel('true stress [MPa]')
-        plt.xlim(0, 1.05 * max(eps_t))
-        plt.ylim(0, 1.05 * max(sig_t))
-        plt.title(f'True stress/strain curve')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-        
-        if save == True:
+    plt.figure(figsize = (8,4.5))
+    plt.plot(eps_t, sig_t, 'b-', label = fig_label)
+    plt.xlabel('true strain [mm/mm]')
+    plt.ylabel('true stress [MPa]')
+    plt.xlim(0, 1.05 * max(eps_t))
+    plt.ylim(0, 1.05 * max(sig_t))
+    plt.title(f'True stress/strain curve')
+    plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+    
+    if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+        save_path = os.path.abspath(os.path.join('output', name))
+        plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
 
-        if show_plot == True:
+    if show_plot == True:
 
-            plt.show()
+        plt.show()
 
 def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 
-        eps_c, sig_c = uniform_plast(strain, stress, sig_y, uts)
+    eps_c, sig_c = uniform_plast(strain, stress, sig_y, uts)
 
-        eps_t, sig_t = true_values(eps_c, sig_c)
+    eps_t, sig_t = true_values(eps_c, sig_c)
 
-        eps_tl = np.log(eps_t)
-        sig_tl = np.log(sig_t)
+    eps_tl = np.log(eps_t)
+    sig_tl = np.log(sig_t)
 
-        init_guess = [300, 0.25]
+    init_guess = [300, 0.25]
 
-        ans, cov = curve_fit(log_Hollomon, eps_tl, sig_tl, p0 = init_guess)
+    ans, cov = curve_fit(log_Hollomon, eps_tl, sig_tl, p0 = init_guess)
 
-        Koeff = ans[0]
-        shex = ans[1]
+    Koeff = ans[0]
+    shex = ans[1]
 
-        sig_h = log_Hollomon(eps_tl, K = Koeff, n = shex)
+    sig_h = log_Hollomon(eps_tl, K = Koeff, n = shex)
 
-        R2 = r_squared(eps_tl, sig_tl, log_Hollomon, ans)
+    R2 = r_squared(eps_tl, sig_tl, log_Hollomon, ans)
 
-        plt.figure(figsize = (8,4.5))
-        plt.plot(eps_tl, sig_tl, 'b-', label = 'Stress-Strain log values')
-        plt.plot(eps_tl, sig_h, 'r:', label = f'Linear Hollomon, K = {round(Koeff)} MPa, n = {round(shex, 2)}, R²={round(R2, 4)}')
-        plt.xlabel('log(strain) [mm/mm]')
-        plt.ylabel('log(stress) [MPa]')
-        plt.title(f'{func} fitted to the data')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)        
+    plt.figure(figsize = (8,4.5))
+    plt.plot(eps_tl, sig_tl, 'b-', label = 'Stress-Strain log values')
+    plt.plot(eps_tl, sig_h, 'r:', label = f'Linear Hollomon, K = {round(Koeff)} MPa, n = {round(shex, 2)}, R²={round(R2, 4)}')
+    plt.xlabel('log(strain) [mm/mm]')
+    plt.ylabel('log(stress) [MPa]')
+    plt.title(f'{func} fitted to the data')
+    plt.legend(fontsize = 12, loc = 'lower right', frameon = False)        
 
-        if show_plot == True:
+    if show_plot == True:
 
-            plt.show()
+        plt.show()
 
-        if save == True:
-            
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
-            
-        if show == True:
+    if save == True:
+        
+        save_path = os.path.abspath(os.path.join('output', name))
+        plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+        
+    if show == True:
 
-            print(f'The resistance modulus is {round(Koeff)} MPa and the strain-hardening exponent is {round(shex, 2)}.')
+        print(f'The resistance modulus is {round(Koeff)} MPa and the strain-hardening exponent is {round(shex, 2)}.')
 
-        return shex, Koeff
+    return shex, Koeff
 
 
         
