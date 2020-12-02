@@ -318,6 +318,10 @@ def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot 
     show_plot - default = True; if True, the plot is shown in a matplotlib interface.
     save - default = False, if True, saves the figure in the folder output;
     name - default = flow_curve; the name of the file saved in the output folder.
+
+    Outputs:    
+
+    Figure that can be displayed in matplotlib interface and/or saved to the output folder.
     '''
     eps = strain.to_numpy()
     sig = stress.to_numpy()
@@ -347,6 +351,25 @@ def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot 
 
 def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
 
+    '''
+    Plots the true stress-strain conversion of the input data.
+
+    Inputs:
+
+    strain - the vector containing the strain values obtained from the tests.
+    stress - the vector containing the stress values that refer to the strain vector.
+    sig_y - the yield strength, in MPa.
+    uts - the ultimate tensile strength, in MPa.
+    fig_label - default = Sample; the string that identify the sample name in the output figure.
+    show_plot - default = True; if True, the plot is shown in a matplotlib interface.
+    save - default = False, if True, saves the figure in the folder output;
+    name - default = true_SSC; the name of the file saved in the output folder.
+
+    Output:
+
+    Figure that can be displayed in matplotlib interface and/or saved to the output folder.
+    '''
+
     eps, sig = uniform_plast(strain, stress, sig_y, uts)
     eps_t, sig_t = true_values(eps, sig)
 
@@ -370,6 +393,29 @@ def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = 
         plt.show()
 
 def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
+
+    # TODO: implement other functions other than Hollomon.
+    '''
+    Calculates the regression coefficients for a model of plasticity, i.e. Hollomon's equation.
+
+    Inputs:
+
+    strain - the vector containing the strain values obtained from the tests.
+    stress - the vector containing the stress values that refer to the strain vector.
+    sig_y - the yield strength, in MPa.
+    uts - the ultimate tensile strength, in MPa.
+    fig_label - default = Sample; the string that identify the sample name in the output figure.
+    show_plot - default = True; if True, the plot is shown in a matplotlib interface.
+    save - default = False, if True, saves the figure in the folder output;
+    name - default = flow_model; the name of the file saved in the output folder.
+
+    Output:
+
+    shex - strain hardening coefficient, n.
+    Koeff - resistance modulus K, in MPa.
+    
+    Figure that can be displayed in matplotlib interface and/or saved to the output folder.
+    '''
 
     eps_c, sig_c = uniform_plast(strain, stress, sig_y, uts)
 
