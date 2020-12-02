@@ -394,7 +394,7 @@ def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = 
 
 def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 
-    # TODO: implement other functions other than Hollomon.
+    # TODO: implement functions other than Hollomon.
     '''
     Calculates the regression coefficients for a model of plasticity, i.e. Hollomon's equation.
 
