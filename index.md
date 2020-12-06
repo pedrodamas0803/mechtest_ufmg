@@ -2,11 +2,13 @@
 
 ### Uma biblioteca de python para análise de dados de ensaios mecânicos.
 
-Esta biblioteca está sendo desenvolvida para ser uma ferramenta de uso dos alunos da disciplina de Caracterização microestrutural e mecânica de metais, ofertada na UFMG, pelo Departamento de Engenharia Metalúrgica e de Materiais da Escola de Engenharia. A disciplina é ofertada como optativa ao curso de graduação em engenharia metalúrgica, bem como aos alunos do Programa de Pós Graduação em Engenharia Metalúrgica, Materiais e de Minas. 
+Esta biblioteca está sendo desenvolvida como uma ferramenta de uso dos alunos da disciplina de Caracterização microestrutural e mecânica de metais, ofertada na UFMG, pelo Departamento de Engenharia Metalúrgica e de Materiais da Escola de Engenharia. A disciplina é ofertada como optativa ao curso de graduação em engenharia metalúrgica, bem como aos alunos do Programa de Pós Graduação em Engenharia Metalúrgica, Materiais e de Minas. 
 
-Este é um projeto em desenvolvimento, as funções realizam o trabalho proposto, porém não estão otimizadas e nem finalizadas. O uso proposto a esta biblioteca é pensado para facilitar a análise de dados de ensaios mecânicos e, principalmente, permitir padronização da metodologia e maior confiabilidade na comparação de dados.
+Este é um projeto em desenvolvimento, as funções realizam o trabalho esperado, porém não estão otimizadas e nem finalizadas. O uso proposto a esta biblioteca é pensado para facilitar a análise de dados de ensaios mecânicos e, principalmente, permitir padronização da metodologia e maior confiabilidade na comparação de dados.
 
 Atualmente as funções implementadas são exclusivas para obtenção de propriedades básicas a partir de dados de ensaio de tração de materiais com comportamento elasto-plástico. 
+
+
 
 
 <!-- ## Welcome to GitHub Pages -->
