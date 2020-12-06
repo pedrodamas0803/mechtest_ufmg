@@ -9,9 +9,9 @@ Este é um projeto em desenvolvimento, as funções realizam o trabalho proposto
 Atualmente as funções implementadas são exclusivas para obtenção de propriedades básicas a partir de dados de ensaio de tração de materiais com comportamento elasto-plástico. 
 
 
-## Welcome to GitHub Pages
+<!-- ## Welcome to GitHub Pages -->
 
-You can use the [editor on GitHub](https://github.com/pedrodamas0803/mechtest_ufmg/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+<!-- You can use the [editor on GitHub](https://github.com/pedrodamas0803/mechtest_ufmg/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
 
 Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
 
@@ -45,4 +45,4 @@ Your Pages site will use the layout and styles from the Jekyll theme you have se
 
 ### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out. -->
