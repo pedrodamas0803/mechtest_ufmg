@@ -51,58 +51,7 @@ def find_index(array, value):
         while array[i] < value:
                 i = i + 1
         return i
-
-def uniform_plast(strain, stress, sig_y, uts):
-
-        '''
-        Takes the data portion between the yield stress and the ultimate tensile strength.
-
-        Inputs:
-
-        strain - the vector containing strain data.
-        stress - the vector containing stress data.
-        sig_y - the yield stress.
-        uts - the ultimate tensile strength.
-
-        Outputs:
-
-        eps_c - the strain portion between sig_y and uts.
-        sig_c - the stress portion between sig_y and uts.
-
-        '''
-
-    
-        eps = strain.to_numpy()
-        sig = stress.to_numpy()
-
-        yield_index = find_index(sig, sig_y)
-        uts_index = find_index(sig, uts)
-
-        eps_c = eps[yield_index:uts_index]
-        sig_c = sig[yield_index:uts_index]
-
-        return eps_c, sig_c
-
-def true_values(strain, stress):
-        
-        '''
-        Returns the true stress and strain vectors.
-
-        Inputs:
-
-        strain - the vector containing the engineering strain vector.
-        stress - the vector containing the engineering stress vectos.
-
-        Outputs:
-
-        eps_t, sig_t - the vectors containing the calculated true strain and stress values.
-        '''
-        
-        
-        eps_t = np.log(1 + strain)
-        sig_t = stress * (1 + strain)
-
-        return eps_t, sig_t
+  
 
 
 def log_Hollomon(log_strain, K = 300, n = 0.25):

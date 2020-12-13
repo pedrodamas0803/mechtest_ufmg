@@ -52,7 +52,7 @@ class Tensile_test:
         self.crossec_area = crossec_area
         self.specimen_length = specimen_length
         self.stress_unit = stress_unit
-        # self.young_modulus = 0
+        self.young_modulus = 0
         # self.intercept = 0
         # self.young_gpa = 0
         # self.young_r2 = 0
@@ -67,15 +67,12 @@ class Tensile_test:
             self.stress = y
         else:
             self.strain = x/crossec_area
-    @property
-    def young_modulus(self):
-        return 0
-
-    @young_modulus.setter
-    def young_modulus(self):
+    
+    @classmethod
+    def young_modulus(cls):
         # taking only the elastic portion of a curve
-        x = strain[self.strain < 0.002]
-        y = stress[0:len(x)]
+        x = cls.strain[cls.strain < 0.002]
+        y = cls.stress[0:len(x)]
 
         # performing the linear regression on the elastic part of the data
         init_guess = [100000, 0]
@@ -86,47 +83,11 @@ class Tensile_test:
         E_gpa = round(E / 1000)
 
         # calculating the R_squared statistic
-        r2 = r_squared(x, y, Hooke, ans)
-
-        # output = [E, E_gpa, intercept, r2]
-        self.young_modulus = E
-        self.intercept = intercept
-        self.young_gpa = E_gpa
-        self.young_r2 = r2
+        r2 = r_squared(x, y, Hooke, ans) 
         
+        cls.young_modulus = E
 
-    def plot_eng_SSC(self, show_plot = True,
-                    save = False, filename = 'eng_SSC'):
-            
-        '''
-        Plots the conventional, or engineering, stress-strain curves.
-        Inputs:
-        show_plot - default = True; if set to false, the plot is not shown when the script runs.
-        save - default = False; if set to true, will save the figure ina output folder within the running directory.
-        filename - default = eng_SSC; sets the name of the file that will be saved.
-        Outputs:
-        Engineering stress-strain curve as a file or image shown with matplotlib interface.
-        '''
-
-        # plot_mech(strain, stress, fig_label = self.name, stress_unit = self.stress_unit,
-        #          show_plot = show_plot, save = save, name = f'{self.name}_{filename}', plot_type = 'ssc')    
-        
-        plt.figure(figsize=(8, 4.5), facecolor = 'white')
-        plt.plot(self.strain, self.stress, 'b-', label = self.name)
-        plt.xlabel('strain [mm/mm]')
-        plt.ylabel(f'stress [{self.stress_unit}]')
-        plt.xlim(0, 1.05 * max(self.strain))
-        plt.ylim(0, 1.05 * max(self.stress))
-        plt.title(f'Engineering stress/strain curve')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-
-        if save == True:
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
-        
-        if show_plot == True:
-            plt.show()
-
+    
 
 
     def plot_young_modulus(self, fig_label = 'Sample', show_plot = True, save = False, filename = 'elasticity'):
@@ -561,8 +522,7 @@ if __name__ == "__main__":
     astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1055')
 
     # astm1055.plot_eng_SSC(show_plot=True)
-
     astm1055.young_modulus()
     print(astm1055.young_modulus)
-    print(astm1055.young_gpa)
+    # print(astm1055.young_gpa)
         
