@@ -1,9 +1,7 @@
-from collections import Counter
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
-import mechtest_ufmg.Utils 
 import os
 from mechtest_ufmg.Utils import *
 
@@ -78,7 +76,7 @@ class Tensile_test:
         # performing the linear regression on the elastic part of the data
         init_guess = [100000, 0]
         model = curve_fit(Hooke, x, y, p0 = init_guess)
-        ans, cov = model
+        ans, *_ = model
         E_mpa, intercept = ans
         fit_curve = E_mpa * x + intercept
         E_gpa = round(E_mpa / 1000)
@@ -290,6 +288,7 @@ class Tensile_test:
 
         return eps_c, sig_c
 
+
     def real_values(self):
         
         '''
@@ -342,26 +341,39 @@ class Tensile_test:
         Figure that can be displayed in matplotlib interface and/or saved to the output folder.
         # '''
 
-        if model not in ['Hollomon', 'Ludwik']:
+        if model not in ['Hollomon', 'Ludwik', 'Datsko']:
             raise ValueError('The model must be Hollomon, Ludwik..')
 
-        eps_t, sig_t = real_values()
+        x, y = self.real_values()
 
-        eps_tl = np.log(eps_t)
-        sig_tl = np.log(sig_t)
+        if model == 'Hollomon':
 
-        init_guess = [300, 0.25]
+            init_guess = [300, 0.25]
 
-        ans, cov = curve_fit(log_Hollomon, eps_tl, sig_tl, p0 = init_guess)
+            model_fit = curve_fit(Hollomon, x, y, p0 = init_guess)
 
-        Koeff = ans[0]
-        shex = ans[1]
+            ans, *_ = model_fit
+            K, n = ans
 
-        sig_h = log_Hollomon(eps_tl, K = Koeff, n = shex)
+            sig_h = Hollomon(x, K = K, n = n)
 
-        R2 = r_squared(eps_tl, sig_tl, log_Hollomon, ans)
+            R2 = r_squared(x, y, Hollomon, ans)
 
-        return shex, Koeff
+            return n, K, R2
+
+        elif model == 'Ludwik':
+
+            init_guess = [300, 300, 0.25]
+
+            model_fit = curve_fit(Ludwik, x, y, p0 = init_guess)
+            ans, *_ = model_fit    
+            sig_0, K, n = ans
+
+            sig_h = Ludwik(x, sig0 = sig_0, K = K, n = n)
+
+            R2 = r_squared(x, y, Ludwik, ans)
+
+            return sig_0, K, n, R2
 
 
 if __name__ == "__main__":
@@ -383,4 +395,5 @@ if __name__ == "__main__":
     print(astm1055.aprox_resilience)
     print(astm1055.resilience)
 
+    print(astm1055.flow_model())
         
