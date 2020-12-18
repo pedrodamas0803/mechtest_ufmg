@@ -1,9 +1,10 @@
+from mechtest_ufmg.Utils import *
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
 import os
-from mechtest_ufmg.Utils import *
+# from mechtest_ufmg.Utils import *
 
 class Tensile_test:
     '''
@@ -114,10 +115,10 @@ class Tensile_test:
         z = Hooke(k, self.young_modulus[0])
         # finding the index of sig_y
         i = 0
-        while stress[i] > z[i]:
+        while self.stress[i] > z[i]:
             i = i + 1
 
-        sig_y = stress[i]  
+        sig_y = self.stress[i]  
         
         return sig_y
 
@@ -342,34 +343,35 @@ class Tensile_test:
         # '''
 
         if model not in ['Hollomon', 'Ludwik', 'Datsko']:
-            raise ValueError('The model must be Hollomon, Ludwik..')
+            raise ValueError('The model must be Hollomon, Ludwik, or Datsko')
 
         x, y = self.real_values()
 
         if model == 'Hollomon':
 
             init_guess = [300, 0.25]
-
+            
             model_fit = curve_fit(Hollomon, x, y, p0 = init_guess)
 
             ans, *_ = model_fit
-            K, n = ans
+            Kexp, nexp = ans
 
-            sig_h = Hollomon(x, K = K, n = n)
+            sig_h = Hollomon(x, K = Kexp, n = nexp)
 
             R2 = r_squared(x, y, Hollomon, ans)
 
-            return n, K, R2
+            return nexp, Kexp, R2
 
         elif model == 'Ludwik':
 
-            init_guess = [300, 300, 0.25]
-
+            init_guess = [300, 600, 0.25]
+            
             model_fit = curve_fit(Ludwik, x, y, p0 = init_guess)
-            ans, *_ = model_fit    
+
+            ans, *_ = model_fit
             sig_0, K, n = ans
 
-            sig_h = Ludwik(x, sig0 = sig_0, K = K, n = n)
+            sig_h = Ludwik(x, sig_o = 300, K = 600, n = 0.24)
 
             R2 = r_squared(x, y, Ludwik, ans)
 

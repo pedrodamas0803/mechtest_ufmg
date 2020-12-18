@@ -62,19 +62,14 @@ def Hollomon(x, K = 300, n = 0.25):
         '''
         return K * x ** n
 
-
-
-
 def Ludwik(x, sig_o = 300, K = 600, n = 0.24):
 
         return sig_o + K * x ** n
 
-
-
-def Datsko(x, K = 300, x0 = 300, n = 0.20 ):
+def Datsko(x, K = 300, x0 = 300, n = 0.20):
 
         return K * (x0 + x) ** n 
-        
+      
 
 # def plot_mech(strain, stress, fig_label = 'Sample', stress_unit = 'MPa',
 #                 show_plot = True, save = False, name = None, plot_type = 'ssc'):
