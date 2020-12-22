@@ -464,3 +464,26 @@ class Tensile_test:
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
         plt.show()
+
+    def plot_true_curve(self, save = False):
+
+        x, y = self.real_values()
+
+        plt.figure(figsize=(8, 4.5))
+        plt.plot(x, y, color = 'blue', label = self.name)
+        plt.xlabel('true strain [mm/mm]')
+        plt.ylabel(f'true stress [{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(x))
+        plt.ylim(0, 1.05 * max(y))
+        plt.title(f'True stress/strain curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', self.name + '_true'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
+
+        plt.show()
+
+    def plot_flow_model(self, model = 'Hollomon', save = False):
+        pass

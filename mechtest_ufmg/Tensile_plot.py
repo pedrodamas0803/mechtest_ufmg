@@ -242,49 +242,7 @@ class Tensile_test:
 
  
 
-    def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
-
-        '''
-        Plots the true stress-strain conversion of the input data.
-
-        Inputs:
-
-        strain - the vector containing the strain values obtained from the tests.
-        stress - the vector containing the stress values that refer to the strain vector.
-        sig_y - the yield strength, in MPa.
-        uts - the ultimate tensile strength, in MPa.
-        fig_label - default = Sample; the string that identify the sample name in the output figure.
-        show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-        save - default = False, if True, saves the figure in the folder output;
-        name - default = true_SSC; the name of the file saved in the output folder.
-
-        Output:
-
-        Figure that can be displayed in matplotlib interface and/or saved to the output folder.
-        '''
-
-        eps, sig = uniform_plast(strain, stress, sig_y, uts)
-        eps_t, sig_t = true_values(eps, sig)
-
-        plt.figure(figsize = (8,4.5))
-        plt.plot(eps_t, sig_t, 'b-', label = fig_label)
-        plt.xlabel('true strain [mm/mm]')
-        plt.ylabel('true stress [MPa]')
-        plt.xlim(0, 1.05 * max(eps_t))
-        plt.ylim(0, 1.05 * max(sig_t))
-        plt.title(f'True stress/strain curve')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-        
-        if save == True:
-
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
-
-
-        if show_plot == True:
-
-            plt.show()
-
+    
     # def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 
         # TODO: implement functions other than Hollomon.
