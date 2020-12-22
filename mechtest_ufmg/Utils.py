@@ -62,7 +62,7 @@ def Hollomon(x, K = 300, n = 0.25):
         '''
         return K * x ** n
 
-def Ludwik(x, sig_o = 300, K = 600, n = 0.24):
+def Ludwik(x, sig_o = 600, K = 600, n = 0.24):
 
         return sig_o + K * x ** n
 

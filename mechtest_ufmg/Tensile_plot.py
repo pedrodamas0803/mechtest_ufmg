@@ -90,119 +90,6 @@ class Tensile_test:
     
 
 
-    def plot_young_modulus(self, fig_label = 'Sample', show_plot = True, save = False, filename = 'elasticity'):
-
-        '''
-        Calculates the apparent modulus of elasticity of the material from the engineering stress-strain data. 
-        
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        fig_label - the name of the sample or test run that will appear in the legend.
-        show_plot - default = True; if set to false, the plot is not shown when the script runs.
-        save - default = False; if set to true, will save the figure ina output folder within the running directory.
-        name - default = elasticity; sets the name of the file that will be saved.
-        
-        Outputs:
-        E - the apparent modulus of elasticity in the same units as the stress input; e.g.: [MPa].
-        b - the stress intercept obtained from the regression process.
-        R_squared - the R^2 statistics related to the linear regression of the linear portion of the stress-strain curve.
-
-        Figure showing the portion of the curve that was fitted and the regression data, except b.
-        '''
-
-        # taking only the elastic portion of a curve
-        x = strain[self.strain < 0.002]
-        y = stress[0:len(x)]
-
-        # performing the linear regression on the elastic part of the data
-        init_guess = [100000, 0]
-        model = curve_fit(Hooke, x, y, p0 = init_guess)
-        ans, cov = model
-        E, b = ans
-        fit_curve = E * x + b
-        E_gpa = round(E / 1000)
-
-        # calculating the R_squared statistic
-        r2 = r_squared(x, y, Hooke, ans)
-            
-        # plotting the figure and showing or saving the figure
-        plt.figure(figsize = (8,4.5))
-        plt.plot(self.strain, self.stress, 'b-', label = self.name)
-        plt.plot(x, fit_curve, 'r-', linewidth = 2, label = 'Fitted curve' )
-        plt.xlabel('strain [mm/mm]')
-        plt.ylabel(f'stress [{self.stress_unit}]')
-        plt.xlim(0, 1.05* max(self.strain))
-        plt.ylim(0, 1.05 * max(self.stress))
-        plt.title(f'Elasticity modulus determination')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-        plt.text(0.1 * max(self.strain), 0.1 * max(self.stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
-
-        if save == True:
-
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)        
-        
-        if show_plot == True:
-            plt.show()
-
-        return E, int(b), r2
-
-    def yield_strength(self, E_mpa, b = 0, fig_label = 'Sample', show_plot = True, save = False, name = 'sigma_yield'):
-
-        '''
-        Calculates the yielding stress as the stress related to a permanent deformation of 0.002.
-
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        E_mpa - the modulus of elasticity in MPa (should work if the units are consistent, but not SI), whether user stated or calculated by young_modulus function.
-        b - default = 0; the intercept of the regression for the specific data, leads to a higher precision result.
-        fig_label - the name of the sample or test run that will appear in the legend.
-        show_plot - default = True; if set to false, the plot is not shown when the script runs.
-        save - default = False; if set to true, will save the figure ina output folder within the running directory.
-        name - default = sigma_yield; sets the name of the file that will be saved.
-
-        Outputs:
-        sigma_yield - the yielding stress in the same unit of stress input.
-
-        Figure showing the lines used to compare and determine the yield strength.
-        '''
-        # taking part of the data
-        x = self.strain[self.strain < 0.05]
-        k = x - 0.002
-        z = Hooke(k, E_mpa)
-        # finding the index of sig_y
-        i = 0
-        while stress[i] > z[i]:
-            i = i + 1
-
-        sig_y = stress[i]  
-                
-        plt.figure(figsize = (8,4.5))
-        plt.plot(strain, stress, 'b-', label = fig_label)
-        plt.plot(x, Hooke(x, E_mpa, b), 'r--', linewidth = 1, label = 'Hooke\'s law' )
-        plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
-        plt.xlabel('strain [mm/mm]')
-        plt.ylabel('stress [MPa]')
-        plt.xlim(0, 1.05 * max(strain))
-        plt.ylim(0, 1.05 * max(stress))
-        plt.title(f'Yield strength determination')
-        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-        plt.text(0.1 * max(strain), 0.1 * max(stress), f'The yield strength is {round(sig_y)} MPa.', fontsize = 12)
-
-        if save == True:
-
-            save_path = os.path.abspath(os.path.join('output', name))
-            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
-
-        if show_plot == True:
-            plt.show()
-
-        print(f'The yield strength is {round(sig_y)} MPa.')
-        
-        return sig_y
-
     # def ultimate_tens_stren(strain, stress, show = True):
 
     #     '''
@@ -353,95 +240,50 @@ class Tensile_test:
         
     #     return mat_toughness
 
-    # def plot_flow_curve(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'flow_curve'):
-    #                                                     # TODO: deal with discontinuous yielding; how can I determine where it ends?
+ 
 
-    #     '''
-    #     Plots the flow stress curve from the material stress-strain curve with values between the yield strength and the ultimate tensile strength.
+    def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
 
-    #     Inputs:
+        '''
+        Plots the true stress-strain conversion of the input data.
 
-    #     strain - the vector containing the strain values obtained from the tests.
-    #     stress - the vector containing the stress values that refer to the strain vector.
-    #     sig_y - the yield strength, in MPa.
-    #     uts - the ultimate tensile strength, in MPa.
-    #     fig_label - default = Sample; the string that identify the sample name in the output figure.
-    #     show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-    #     save - default = False, if True, saves the figure in the folder output;
-    #     name - default = flow_curve; the name of the file saved in the output folder.
+        Inputs:
 
-    #     Outputs:    
+        strain - the vector containing the strain values obtained from the tests.
+        stress - the vector containing the stress values that refer to the strain vector.
+        sig_y - the yield strength, in MPa.
+        uts - the ultimate tensile strength, in MPa.
+        fig_label - default = Sample; the string that identify the sample name in the output figure.
+        show_plot - default = True; if True, the plot is shown in a matplotlib interface.
+        save - default = False, if True, saves the figure in the folder output;
+        name - default = true_SSC; the name of the file saved in the output folder.
 
-    #     Figure that can be displayed in matplotlib interface and/or saved to the output folder.
-    #     '''
-    #     eps = strain.to_numpy()
-    #     sig = stress.to_numpy()
+        Output:
 
-    #     yield_index = find_index(sig, sig_y)
-    #     uts_index = find_index(sig, uts)
+        Figure that can be displayed in matplotlib interface and/or saved to the output folder.
+        '''
 
-    #     eps_c = eps[yield_index:uts_index]
-    #     sig_c = sig[yield_index:uts_index]
+        eps, sig = uniform_plast(strain, stress, sig_y, uts)
+        eps_t, sig_t = true_values(eps, sig)
 
-    #     plt.figure(figsize = (8,4.5))
-    #     plt.plot(eps_c, sig_c, 'b-', label = fig_label)
-    #     plt.xlabel('strain [mm/mm]')
-    #     plt.ylabel('stress [MPa]')
-    #     plt.xlim(0, 1.05 * max(strain))
-    #     plt.ylim(0, 1.05 * max(stress))
-    #     plt.title(f'Flow stress curve')
-    #     plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
-
-    #     if show_plot == True:
-    #         plt.show()
-
-    # if save == True:
-
-    #     save_path = os.path.abspath(os.path.join('output', name))
-    #     plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
-
-    # def plot_true_SSC(strain, stress, sig_y, uts, fig_label = 'Sample', show_plot = True, save = False, name = 'true_SSC'):
-
-    #     '''
-    #     Plots the true stress-strain conversion of the input data.
-
-    #     Inputs:
-
-    #     strain - the vector containing the strain values obtained from the tests.
-    #     stress - the vector containing the stress values that refer to the strain vector.
-    #     sig_y - the yield strength, in MPa.
-    #     uts - the ultimate tensile strength, in MPa.
-    #     fig_label - default = Sample; the string that identify the sample name in the output figure.
-    #     show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-    #     save - default = False, if True, saves the figure in the folder output;
-    #     name - default = true_SSC; the name of the file saved in the output folder.
-
-    #     Output:
-
-    #     Figure that can be displayed in matplotlib interface and/or saved to the output folder.
-    #     '''
-
-    #     eps, sig = uniform_plast(strain, stress, sig_y, uts)
-    #     eps_t, sig_t = true_values(eps, sig)
-
-    #     plt.figure(figsize = (8,4.5))
-    #     plt.plot(eps_t, sig_t, 'b-', label = fig_label)
-    #     plt.xlabel('true strain [mm/mm]')
-    #     plt.ylabel('true stress [MPa]')
-    #     plt.xlim(0, 1.05 * max(eps_t))
-    #     plt.ylim(0, 1.05 * max(sig_t))
-    #     plt.title(f'True stress/strain curve')
-    #     plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        plt.figure(figsize = (8,4.5))
+        plt.plot(eps_t, sig_t, 'b-', label = fig_label)
+        plt.xlabel('true strain [mm/mm]')
+        plt.ylabel('true stress [MPa]')
+        plt.xlim(0, 1.05 * max(eps_t))
+        plt.ylim(0, 1.05 * max(sig_t))
+        plt.title(f'True stress/strain curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
         
-    #     if save == True:
+        if save == True:
 
-    #         save_path = os.path.abspath(os.path.join('output', name))
-    #         plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+            save_path = os.path.abspath(os.path.join('output', name))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
 
-    #     if show_plot == True:
+        if show_plot == True:
 
-    #         plt.show()
+            plt.show()
 
     # def flow_model(strain, stress, sig_y, uts, func = 'Hollomon', show = True, show_plot = True, save = False, name = 'flow_model'):
 

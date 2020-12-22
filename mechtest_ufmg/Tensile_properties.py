@@ -5,6 +5,8 @@ from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
 import os
 # from mechtest_ufmg.Utils import *
+# Conversion factor from psi to MPa
+psi_to_mpa = 0.00689476
 
 class Tensile_test:
     '''
@@ -24,8 +26,7 @@ class Tensile_test:
     specimen_length - the specimen length in mm, it must be provided if is_strain != True.
     crossec_area - the cross section of the specimen in mm², it must be provided if is_stress != True.
     '''
-    # Conversion factor from psi to MPa
-    psi_to_mpa = 0.00689476
+    
 
     def __init__(self, x, y, is_strain = True, is_stress = True, stress_unit = 'MPa', specimen_name = 'Sample',
                 specimen_length = None, crossec_area = None):
@@ -319,7 +320,6 @@ class Tensile_test:
        
     def flow_model(self, model = 'Hollomon'):
 
-        # TODO: implement functions other than Hollomon.
         '''
         Calculates the regression coefficients for a model of plasticity, i.e. Hollomon's equation.
 
@@ -364,38 +364,103 @@ class Tensile_test:
 
         elif model == 'Ludwik':
 
-            init_guess = [300, 600, 0.25]
+            init_guess = [600, 600, 0.25]
             
             model_fit = curve_fit(Ludwik, x, y, p0 = init_guess)
 
             ans, *_ = model_fit
             sig_0, K, n = ans
 
-            sig_h = Ludwik(x, sig_o = 300, K = 600, n = 0.24)
+            sig_h = Ludwik(x, sig_o = sig_0, K = K, n = n)
 
             R2 = r_squared(x, y, Ludwik, ans)
 
             return sig_0, K, n, R2
 
+        elif model == 'Datsko':
 
-if __name__ == "__main__":
-    
-    import pandas as pd 
+            init_guess = [300, 300, 0.25]
+            
+            model_fit = curve_fit(Datsko, x, y, p0 = init_guess)
 
-    data = pd.read_csv('tests/data/astm1055.tsv', sep='\t', decimal=',')
+            ans, *_ = model_fit
+            K, sig_0, n = ans
 
-    strain = data['Strain']
-    stress = data['Stress']
+            sig_h = Datsko(x, K = K, x0 = sig_0, n = n)
 
-    astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1055')
+            R2 = r_squared(x, y, Datsko, ans)
 
-    
-    print(astm1055.young_modulus)
-    print(astm1055.yield_strength)
-    print(astm1055.UTS)
-    print(astm1055.uniform_elongation)
-    print(astm1055.aprox_resilience)
-    print(astm1055.resilience)
+            return sig_0, K, n, R2
 
-    print(astm1055.flow_model())
+    def plot_young_modulus(self, save = False):
+
+        E_mpa, E_gpa, intercept, r2 = self.young_modulus
+
+        x = self.strain[self.strain < 0.002]
+
+        plt.figure(figsize=(8, 4.5), edgecolor='white', facecolor='white')
+        plt.plot(self.strain, self.stress, color = 'blue', label = self.name)
+        plt.plot(x, Hooke(x, E=E_mpa, b= intercept), color = 'red', label = 'Fitted E',
+                linewidth = 2)
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel(f'stress [{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(self.strain))
+        plt.ylim(0, 1.05 * max(self.stress))
+        plt.title(f'Modulus of elasticity determination')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        plt.text(0.1 * max(self.strain), 0.1 * max(self.stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
+
+        if save:
+            save_path = os.path.abspath(os.path.join('output', self.name + '_elasticity'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
         
+        plt.show()
+
+    def plot_yielding(self, save = False):
+
+        E_mpa, E_gpa, intercept, r2 = self.young_modulus
+
+        x = self.strain[self.strain < 0.05]
+        k = x - 0.002
+        z = Hooke(k, E_mpa)
+
+        plt.figure(figsize = (8,4.5))
+        plt.plot(self.strain, self.stress, 'b-', label = self.name)
+        plt.plot(x, Hooke(x, E_mpa, intercept), 'r--', linewidth = 1, label = 'Hooke\'s law' )
+        plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel(f'stress [{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(self.strain))
+        plt.ylim(0, 1.05 * max(self.stress))
+        plt.title(f'Yield strength determination')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        plt.text(0.1 * max(self.strain), 0.1 * max(self.stress), 
+                f'The yield strength is {round(self.yield_strength)} MPa.', fontsize = 12)
+
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', self.name + '_yielding'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+
+        plt.show()
+
+    def plot_flow_curve(self, save = False):
+
+        yield_index = find_index(self.stress, self.yield_strength)
+
+        plt.figure(figsize = (8,4.5))
+        plt.plot(self.strain[yield_index: ], self.stress[yield_index: ],
+                 color = 'blue', label = self.name)
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel(f'stress [{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(self.strain))
+        plt.ylim(0, 1.05 * max(self.stress))
+        plt.title(f'Flow stress curve')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', self.name + '_flow'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
+
+        plt.show()
