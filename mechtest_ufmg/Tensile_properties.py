@@ -166,7 +166,7 @@ class Tensile_test:
         return u_elong
 
     @property
-    def aprox_resilience(self):
+    def approx_resilience(self):
 
         '''
         Calculates the resilience by the approximation formula U_r = sigma_yield^2/E.
@@ -213,7 +213,7 @@ class Tensile_test:
         return U_r
 
     @property
-    def aprox_toughness(self):
+    def approx_toughness(self):
 
         '''
         Calculates an approximation of the toughness using the formula U_t = eps_f * ((sig_y + uts)/2).
@@ -392,6 +392,25 @@ class Tensile_test:
 
             return sig_0, K, n, R2
 
+
+    def plot_conventional_curve(self, save = False):
+
+        plt.figure(figsize=(8, 4.5))
+        plt.plot(self.strain, self.stress, color = 'blue', label = self.name)
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel(f'stress[{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(self.strain))
+        plt.ylim(0, max(self.stress))
+        plt.title('Engineering stress/strain curve')
+        plt.legend(fontsize=12, loc = 'lower right', frameon = False)
+
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', self.name + '_engineering'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
+
+        plt.show()
+
     def plot_young_modulus(self, save = False):
 
         E_mpa, E_gpa, intercept, r2 = self.young_modulus
@@ -486,4 +505,80 @@ class Tensile_test:
         plt.show()
 
     def plot_flow_model(self, model = 'Hollomon', save = False):
-        pass
+        
+
+        if model not in ['Hollomon', 'Ludwik', 'Datsko']:
+            raise ValueError('Please provide a valid model.')
+
+        x, y = self.real_values()
+
+        plt.figure(figsize = (8, 4.5))
+        plt.plot(x, y, color = 'blue', label = self.name)
+        
+        if model == 'Hollomon':
+
+           nexp, Kexp, R2 = self.flow_model(model = 'Hollomon')
+
+           fit_y = Hollomon(x, K = Kexp, n = nexp)
+
+           plt.plot(x, fit_y, 'r--', label = r'$\sigma = K \epsilon ^ n$')
+           plt.plot([], [], ' ', label = f'K = {round(Kexp)}\nn = {round(nexp, 3)}\nR² = {round(R2, 3)}')
+
+        if model == 'Ludwik':
+
+           sig_0, Kexp, nexp, R2 = self.flow_model(model = 'Ludwik')
+
+           fit_y = Ludwik(x, sig_o = sig_0, K = Kexp, n = nexp)
+
+           plt.plot(x, fit_y, 'r--', label = r'$\sigma = \sigma_0 + K \epsilon ^ n$')
+           plt.plot([], [], ' ', 
+                    label = f'K = {round(Kexp)}\nn = {round(nexp,3)}\n' + r'$\sigma_0 =$' + f'{round(sig_0)}\nR² = {round(R2, 3)}')
+        
+        if model == 'Datsko':
+
+           sig_0, Kexp, nexp, R2 = self.flow_model(model = 'Datsko')
+
+           fit_y = Datsko(x, x0 = sig_0, K = Kexp, n = nexp)
+
+           plt.plot(x, fit_y, 'r--', label = r'$\sigma = K (\epsilon_0 + \epsilon) ^ n$')
+           plt.plot([], [], ' ', 
+                    label = f'K = {round(Kexp)}\nn = {round(nexp,3)}\n' + r'$\epsilon_0 =$' + f'{round(sig_0)}\nR² = {round(R2, 3)}')
+
+
+
+        plt.xlabel('strain [mm/mm]')
+        plt.ylabel(f'stress [{self.stress_unit}]')
+        plt.xlim(0, 1.05 * max(x))
+        plt.ylim(0, 1.05 * max(y))
+        plt.title(f'{model} flow model fitting')
+        plt.legend(fontsize = 12, loc = 'lower right', frameon = False)
+        
+        if save == True:
+
+            save_path = os.path.abspath(os.path.join('output', self.name + f'{model} fit'))
+            plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
+        
+        plt.show()
+
+
+    def summary(self):
+        
+        filename = os.path.abspath(os.path.join('output', self.name + '_summary.txt'))
+
+        # with open(os.path.abspath(f'output/{filename}'), 'a') as f:
+
+        f = open(filename, 'x')
+
+        f.write(f'Yield strength: {round(self.yield_strength)} {self.stress_unit}\n')
+        f.write(f'Modulus of elasticity: {self.young_modulus[1]} GPa\n')
+        f.write(f'Ultimate tensile strenth: {round(self.UTS)} MPa\n')
+        f.write(f'Uniform elongation: {round(self.uniform_elongation, 4)} mm/mm\n')
+        f.write(f'Approximate resilience: {round(self.approx_resilience, 3)} MJ/m³\n')
+        f.write(f'Resilience: {round(self.resilience, 3)} MJ/m³\n')
+        f.write(f'Approximate toughness: {round(self.approx_toughness, 3)} MJ/m³\n')
+        f.write(f'Toughness: {round(self.toughness, 3)} MJ/m³\n')
+
+        f.close()
+
+
+
