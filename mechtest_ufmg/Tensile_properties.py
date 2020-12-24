@@ -4,6 +4,7 @@ import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
 import os
+import csv
 # from mechtest_ufmg.Utils import *
 # Conversion factor from psi to MPa
 psi_to_mpa = 0.00689476
@@ -562,23 +563,39 @@ class Tensile_test:
 
 
     def summary(self):
+
+        # if not os.path.exists(save_path):
+        #     raise ValueError('Provide a valid save path.')
         
-        filename = os.path.abspath(os.path.join('output', self.name + '_summary.txt'))
+        summ = [('Property [unit]', 'Value'),
+                ('Elasticity mod [GPa]', round(self.young_modulus[1])), 
+                ('Yield strength [MPa]', round(self.yield_strength)),
+                ('Ultimate tens strength [MPa]', round(self.UTS)),
+                ('Uniform elongation [mm/mm]', round(self.uniform_elongation, 4)),
+                ('Approx. resilience [MJ/m³]', round(self.approx_resilience, 3)),
+                ('Resilience [MJ/m³]', round(self.resilience, 3)),
+                ('Approx. toughness [MJ/m³]', round(self.toughness, 3)),
+                ('Toughness [MJ/m³]', round(self.toughness, 3))]
 
-        # with open(os.path.abspath(f'output/{filename}'), 'a') as f:
+        # if not os.path.exists(os.path.abspath('/output/foo.txt')):
 
-        f = open(filename, 'x')
+        #     f = open('/output/foo.txt', 'x')
+        #     f.close()
 
-        f.write(f'Yield strength: {round(self.yield_strength)} {self.stress_unit}\n')
-        f.write(f'Modulus of elasticity: {self.young_modulus[1]} GPa\n')
-        f.write(f'Ultimate tensile strenth: {round(self.UTS)} MPa\n')
-        f.write(f'Uniform elongation: {round(self.uniform_elongation, 4)} mm/mm\n')
-        f.write(f'Approximate resilience: {round(self.approx_resilience, 3)} MJ/m³\n')
-        f.write(f'Resilience: {round(self.resilience, 3)} MJ/m³\n')
-        f.write(f'Approximate toughness: {round(self.approx_toughness, 3)} MJ/m³\n')
-        f.write(f'Toughness: {round(self.toughness, 3)} MJ/m³\n')
+        
+        filename = os.path.abspath(os.path.join('output', self.name + '_summary.csv'))
 
-        f.close()
+        if os.path.exists(filename):
 
+            with open(filename, 'w') as csvfile:
+                
+                writer = csv.writer(csvfile)
+                writer.writerows(summ)         
 
+        else:
+
+            with open(filename, 'x') as csvfile:
+                
+                writer = csv.writer(csvfile)
+                writer.writerows(summ)
 
