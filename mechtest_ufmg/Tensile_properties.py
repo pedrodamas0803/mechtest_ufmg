@@ -54,10 +54,7 @@ class Tensile_test:
         self.crossec_area = crossec_area
         self.specimen_length = specimen_length
         self.stress_unit = stress_unit
-        # self.young_modulus = 0
-        # self.intercept = 0
-        # self.young_gpa = 0
-        # self.young_r2 = 0
+        self.path = os.path.realpath(__file__)
 
         if is_strain == True:
             self.strain = x
@@ -585,6 +582,15 @@ class Tensile_test:
         
         filename = os.path.abspath(os.path.join('output', self.name + '_summary.csv'))
 
+        # filename = os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+        print(self.path)
+        print(filename)
+
+        # with open(filename, 'x') as csvfile:
+                
+        #         writer = csv.writer(csvfile)
+        #         writer.writerows(summ)  
         if os.path.exists(filename):
 
             with open(filename, 'w') as csvfile:
