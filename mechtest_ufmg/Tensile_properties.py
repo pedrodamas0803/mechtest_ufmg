@@ -14,7 +14,7 @@ class Tensile_test:
     Tensile_test
 
     This function will receive you data and create an object with your data entries.
-    UNITS: The expected measurements units of the data are mm/mm² for length/area sizes, and MPa/Newton for stress/force.
+    UNITS: The expected measurements units of the data are mm/mm² for length/area sizes, and MPa/Newton for stress/load.
             All math will be performed according to international standards units.
 
     Inputs:
@@ -54,7 +54,6 @@ class Tensile_test:
         self.crossec_area = crossec_area
         self.specimen_length = specimen_length
         self.stress_unit = stress_unit
-        self.path = os.path.realpath(__file__)
 
         if is_strain == True:
             self.strain = x
@@ -66,6 +65,9 @@ class Tensile_test:
             self.stress = y
         else:
             self.strain = x/crossec_area
+
+        create_output_folder()
+
 
     @property
     def young_modulus(self):
@@ -93,20 +95,9 @@ class Tensile_test:
         '''
         Calculates the yielding stress as the stress related to a permanent deformation of 0.002.
 
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        E_mpa - the modulus of elasticity in MPa (should work if the units are consistent, but not SI), whether user stated or calculated by young_modulus function.
-        b - default = 0; the intercept of the regression for the specific data, leads to a higher precision result.
-        fig_label - the name of the sample or test run that will appear in the legend.
-        show_plot - default = True; if set to false, the plot is not shown when the script runs.
-        save - default = False; if set to true, will save the figure ina output folder within the running directory.
-        name - default = sigma_yield; sets the name of the file that will be saved.
-
         Outputs:
         sigma_yield - the yielding stress in the same unit of stress input.
 
-        Figure showing the lines used to compare and determine the yield strength.
         '''
         # taking part of the data
         x = self.strain[self.strain < 0.05]
@@ -127,11 +118,6 @@ class Tensile_test:
         '''
         Calculates the ultimate tensile stress taking the higher stress from the stress vector input.
 
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        show - default = True; if true, prints the value of UTS in the command line.
-
         Output:
         uts - the ultimate tensile strength in the same unit of the stress input.
 
@@ -144,11 +130,6 @@ class Tensile_test:
 
         '''
         Calculates the uniforme elongation from the input data taking the strain point related to the uts value.
-
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        show - default = True; if true, prints the value of UTS in the command line.
 
         Output:
         u_elong - the uniform elongation of the sample.
@@ -169,11 +150,6 @@ class Tensile_test:
         '''
         Calculates the resilience by the approximation formula U_r = sigma_yield^2/E.
 
-        Inputs:
-        E - the apparent elasticity modulus, in MPa.
-        sig_y - the yield strength, in MPa
-        show - default = True; if True prints a string containing the calculated value.
-
         Output:
 
         U_r - the resilience calculated by the presented formula.
@@ -189,13 +165,6 @@ class Tensile_test:
 
         '''
         Calculates the resilience by numerical integration using the trapezoidal method up to the yield stregth point.
-
-        Inputs:
-        strain - vector containing the strain data in admensional units, if the data is provided in %, divide it by 100; e.g.: [mm/mm].
-        stress - vector containing the stress data relative to the strain vector.
-        sig_y - the yield strength in MPa.
-        dx - default = 1.0; the step size for the integration.
-        show - default = True; if true, prints the value of UTS in the command line.
 
         Output:
 
@@ -216,13 +185,6 @@ class Tensile_test:
         '''
         Calculates an approximation of the toughness using the formula U_t = eps_f * ((sig_y + uts)/2).
 
-        Inputs:
-
-        strain - the vector containing the strain values from the test.
-        sig_y - the yield strength, in MPa
-        uts - the ultimate tensile strength, in MPa
-        show - default = True; if True prints the string containing the material toughness. 
-
         Output:
 
         U_t - the approximate toughness of the material
@@ -241,12 +203,6 @@ class Tensile_test:
         '''
         Calculates the toughness of the material performing the numerical integration of the stress-strain curve.
 
-        Inputs:
-
-        strain - the vector containing the strain values obtained from the tests.
-        stress - the vector containing the stress values that refer to the strain vector.
-        show - default = True; if True prints a string containing the toughness in the command line.
-
         Output:
 
         mat_toughness - the material toughness calculated by numerical integration, in MJ/m³.
@@ -261,17 +217,6 @@ class Tensile_test:
 
         '''
         Plots the flow stress curve from the material stress-strain curve with values between the yield strength and the ultimate tensile strength.
-
-        Inputs:
-
-        strain - the vector containing the strain values obtained from the tests.
-        stress - the vector containing the stress values that refer to the strain vector.
-        sig_y - the yield strength, in MPa.
-        uts - the ultimate tensile strength, in MPa.
-        fig_label - default = Sample; the string that identify the sample name in the output figure.
-        show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-        save - default = False, if True, saves the figure in the folder output;
-        name - default = flow_curve; the name of the file saved in the output folder.
 
         Outputs:    
 
@@ -294,20 +239,9 @@ class Tensile_test:
         '''
         Plots the true stress-strain conversion of the input data.
 
-        Inputs:
-
-        strain - the vector containing the strain values obtained from the tests.
-        stress - the vector containing the stress values that refer to the strain vector.
-        sig_y - the yield strength, in MPa.
-        uts - the ultimate tensile strength, in MPa.
-        fig_label - default = Sample; the string that identify the sample name in the output figure.
-        show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-        save - default = False, if True, saves the figure in the folder output;
-        name - default = true_SSC; the name of the file saved in the output folder.
-
         Output:
 
-        Figure that can be displayed in matplotlib interface and/or saved to the output folder.
+        eps_t, sig_t - the true strain/stress values calculated between the yield strength and ultimate tensil strength.
         '''
         strain, stress = self.uniform_deformation()
              
@@ -321,24 +255,14 @@ class Tensile_test:
         '''
         Calculates the regression coefficients for a model of plasticity, i.e. Hollomon's equation.
 
-        Inputs:
+        Input:
 
-        strain - the vector containing the strain values obtained from the tests.
-        stress - the vector containing the stress values that refer to the strain vector.
-        sig_y - the yield strength, in MPa.
-        uts - the ultimate tensile strength, in MPa.
-        fig_label - default = Sample; the string that identify the sample name in the output figure.
-        show_plot - default = True; if True, the plot is shown in a matplotlib interface.
-        save - default = False, if True, saves the figure in the folder output;
-        name - default = flow_model; the name of the file saved in the output folder.
-
+        model - default = 'Hollomon' - the model to describe the plastic flow of the material.
+                                    Available: Hollomon, Ludwik and Datsko.
         Output:
 
-        shex - strain hardening coefficient, n.
-        Koeff - resistance modulus K, in MPa.
-        
-        Figure that can be displayed in matplotlib interface and/or saved to the output folder.
-        # '''
+        The coefficients of each model and the R² statistics.        
+        '''
 
         if model not in ['Hollomon', 'Ludwik', 'Datsko']:
             raise ValueError('The model must be Hollomon, Ludwik, or Datsko')
@@ -393,12 +317,24 @@ class Tensile_test:
 
     def plot_conventional_curve(self, save = False):
 
+        '''
+        Plots and displays the engineering stress/strain curve for the provided data.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        The engineering stress/strain curve. 
+        '''
+
         plt.figure(figsize=(8, 4.5))
         plt.plot(self.strain, self.stress, color = 'blue', label = self.name)
         plt.xlabel('strain [mm/mm]')
         plt.ylabel(f'stress[{self.stress_unit}]')
         plt.xlim(0, 1.05 * max(self.strain))
-        plt.ylim(0, max(self.stress))
+        plt.ylim(0, 1.05 * max(self.stress))
         plt.title('Engineering stress/strain curve')
         plt.legend(fontsize=12, loc = 'lower right', frameon = False)
 
@@ -410,6 +346,20 @@ class Tensile_test:
         plt.show()
 
     def plot_young_modulus(self, save = False):
+
+        '''
+        Plots and displays the engineering stress/strain curve for the provided data highlighting
+        the data used to calculate the apparent young modulus.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        Figure. 
+        '''
+        
 
         E_mpa, E_gpa, intercept, r2 = self.young_modulus
 
@@ -434,6 +384,19 @@ class Tensile_test:
         plt.show()
 
     def plot_yielding(self, save = False):
+
+        '''
+        Plots and displays the engineering stress/strain curve for the provided data highlighting the
+        calculation of the yield stress.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        Figure. 
+        '''
 
         E_mpa, E_gpa, intercept, r2 = self.young_modulus
 
@@ -463,6 +426,18 @@ class Tensile_test:
 
     def plot_flow_curve(self, save = False):
 
+        '''
+        Plots and displays the flow curve for the provided data.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        Figure.
+        '''
+
         yield_index = find_index(self.stress, self.yield_strength)
 
         plt.figure(figsize = (8,4.5))
@@ -484,6 +459,18 @@ class Tensile_test:
 
     def plot_true_curve(self, save = False):
 
+        '''
+        Plots and displays the true stress/strain curve for the provided data.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        Figure.
+        '''
+
         x, y = self.real_values()
 
         plt.figure(figsize=(8, 4.5))
@@ -503,6 +490,19 @@ class Tensile_test:
         plt.show()
 
     def plot_flow_model(self, model = 'Hollomon', save = False):
+
+        '''
+        Plots and displays the flow stress/strain curve for the provided data and the model
+        derived from it by linear regression.
+
+        Input:
+
+        save - default = False, if True, the figure will be saved to the output folder.
+
+        Output:
+
+        The engineering stress/strain curve. 
+        '''
         
 
         if model not in ['Hollomon', 'Ludwik', 'Datsko']:
@@ -561,9 +561,13 @@ class Tensile_test:
 
     def summary(self):
 
-        # if not os.path.exists(save_path):
-        #     raise ValueError('Provide a valid save path.')
-        
+        '''
+        Saves a csv file with the properties calculated from the input data. 
+
+        '''
+
+        save_path = os.path.join('output', f'{self.name}_summary.csv')
+
         summ = [('Property [unit]', 'Value'),
                 ('Elasticity mod [GPa]', round(self.young_modulus[1])), 
                 ('Yield strength [MPa]', round(self.yield_strength)),
@@ -574,33 +578,16 @@ class Tensile_test:
                 ('Approx. toughness [MJ/m³]', round(self.toughness, 3)),
                 ('Toughness [MJ/m³]', round(self.toughness, 3))]
 
-        # if not os.path.exists(os.path.abspath('/output/foo.txt')):
+        if os.path.exists(save_path):
 
-        #     f = open('/output/foo.txt', 'x')
-        #     f.close()
-
-        
-        filename = os.path.abspath(os.path.join('output', self.name + '_summary.csv'))
-
-        # filename = os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-        print(self.path)
-        print(filename)
-
-        # with open(filename, 'x') as csvfile:
-                
-        #         writer = csv.writer(csvfile)
-        #         writer.writerows(summ)  
-        if os.path.exists(filename):
-
-            with open(filename, 'w') as csvfile:
+            with open(save_path, 'w') as csvfile:
                 
                 writer = csv.writer(csvfile)
                 writer.writerows(summ)         
 
         else:
 
-            with open(filename, 'x') as csvfile:
+            with open(save_path, 'x') as csvfile:
                 
                 writer = csv.writer(csvfile)
                 writer.writerows(summ)
