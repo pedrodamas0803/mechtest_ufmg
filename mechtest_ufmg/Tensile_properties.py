@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.integrate import simps, trapz
 from scipy.optimize import curve_fit
+from scipy.signal import savgol_filter
 import os
 import csv
 # from mechtest_ufmg.Utils import *
@@ -233,6 +234,14 @@ class Tensile_test:
 
         return eps_c, sig_c
 
+    def plastic_deformation(self):
+
+        yield_index =  find_index(self.stress, self.yield_strength)
+
+        x = self.strain[yield_index: ]
+        y = self.stress[yield_index: ]
+
+        return x, y
 
     def real_values(self):
         
@@ -558,6 +567,25 @@ class Tensile_test:
         
         plt.show()
 
+    def diff_flow_model(self):
+
+        x, y = self.plastic_deformation()
+
+        dx = np.gradient(x)
+        dy = np.gradient(y)
+
+        diff = dy/dx
+
+        smth_diff = savgol_filter(diff, window_length = 61, polyorder= 3)
+
+        plt.figure()
+        plt.plot(x, smth_diff)
+        plt.plot(x, y)
+        # plt.ylim(0, )
+        plt.yscale('linear')
+        plt.show()
+        
+
 
     def summary(self):
 
@@ -591,4 +619,7 @@ class Tensile_test:
                 
                 writer = csv.writer(csvfile)
                 writer.writerows(summ)
+
+
+
 
