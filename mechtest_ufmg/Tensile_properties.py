@@ -67,7 +67,8 @@ class Tensile_test:
         else:
             self.strain = x/crossec_area
 
-        create_output_folder()
+        self.path = f'{self.name}_output'
+        create_output_folder(path = self.path)
 
 
     @property
@@ -81,7 +82,6 @@ class Tensile_test:
         model = curve_fit(Hooke, x, y, p0 = init_guess)
         ans, *_ = model
         E_mpa, intercept = ans
-        fit_curve = E_mpa * x + intercept
         E_gpa = round(E_mpa / 1000)
 
         # calculating the R_squared statistic
@@ -287,8 +287,6 @@ class Tensile_test:
             ans, *_ = model_fit
             Kexp, nexp = ans
 
-            sig_h = Hollomon(x, K = Kexp, n = nexp)
-
             R2 = r_squared(x, y, Hollomon, ans)
 
             return nexp, Kexp, R2
@@ -302,8 +300,6 @@ class Tensile_test:
             ans, *_ = model_fit
             sig_0, K, n = ans
 
-            sig_h = Ludwik(x, sig_o = sig_0, K = K, n = n)
-
             R2 = r_squared(x, y, Ludwik, ans)
 
             return sig_0, K, n, R2
@@ -316,8 +312,6 @@ class Tensile_test:
 
             ans, *_ = model_fit
             K, sig_0, n = ans
-
-            sig_h = Datsko(x, K = K, x0 = sig_0, n = n)
 
             R2 = r_squared(x, y, Datsko, ans)
 
@@ -349,7 +343,7 @@ class Tensile_test:
 
         if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', self.name + '_engineering'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + '_engineering'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
 
         plt.show()
@@ -387,7 +381,7 @@ class Tensile_test:
         plt.text(0.1 * max(self.strain), 0.1 * max(self.stress), f'The elasticity modulus is {E_gpa} GPa, R² = {round(r2, 4)}', fontsize = 12)
 
         if save:
-            save_path = os.path.abspath(os.path.join('output', self.name + '_elasticity'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + '_elasticity'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
         
         plt.show()
@@ -407,11 +401,10 @@ class Tensile_test:
         Figure. 
         '''
 
-        E_mpa, E_gpa, intercept, r2 = self.young_modulus
+        E_mpa, _, intercept, _ = self.young_modulus
 
         x = self.strain[self.strain < 0.05]
         k = x - 0.002
-        z = Hooke(k, E_mpa)
 
         plt.figure(figsize = (8,4.5))
         plt.plot(self.strain, self.stress, 'b-', label = self.name)
@@ -428,7 +421,7 @@ class Tensile_test:
 
         if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', self.name + '_yielding'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + '_yielding'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
         plt.show()
@@ -461,7 +454,7 @@ class Tensile_test:
 
         if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', self.name + '_flow'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + '_flow'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight',transparent = False)
 
         plt.show()
@@ -493,7 +486,7 @@ class Tensile_test:
 
         if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', self.name + '_true'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + '_true'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
 
         plt.show()
@@ -562,7 +555,7 @@ class Tensile_test:
         
         if save == True:
 
-            save_path = os.path.abspath(os.path.join('output', self.name + f'{model} fit'))
+            save_path = os.path.abspath(os.path.join(self.path, self.name + f'{model} fit'))
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
         
         plt.show()
@@ -594,7 +587,7 @@ class Tensile_test:
 
         '''
 
-        save_path = os.path.join('output', f'{self.name}_summary.csv')
+        save_path = os.path.join(self.path, f'{self.name}_summary.csv')
 
         summ = [('Property [unit]', 'Value'),
                 ('Elasticity mod [GPa]', round(self.young_modulus[1])), 

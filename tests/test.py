@@ -6,12 +6,12 @@ from mechtest_ufmg.Utils import *
 import numpy as np
 import os
 
-data = pd.read_csv('data/astm1055.tsv', sep='\t', decimal=',')
+data = pd.read_csv('data/astm1016.tsv', sep='\t', decimal=',')
 
 strain = data['Strain']
 stress = data['Stress']
 
-astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1055')
+astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1016')
 
 
 # astm1055.plot_young_modulus(save=True)
