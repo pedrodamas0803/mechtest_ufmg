@@ -29,12 +29,3 @@ astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1016')
 # astm1055.plot_flow_model(save = True)
 
 # astm1055.summary()
-
-x, y = astm1055.plastic_deformation()
-
-plt.figure()
-
-plt.plot(astm1055.strain, astm1055.stress)
-plt.plot(x, y)
-plt.show()
-# astm1055.diff_flow_model()

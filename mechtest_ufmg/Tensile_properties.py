@@ -236,20 +236,22 @@ class Tensile_test:
 
     def plastic_deformation(self):
 
-        sig = (self.yield_strength + self.UTS / 2)
+        # sig = (self.yield_strength + self.UTS / 2)
 
-        for index, value in enumerate(self.stress):
-            diff = value - self.yield_strength 
-            if diff < 0.05 * sig:
-                i = index
+        # i = 0
+        # for index, value in enumerate(self.stress):
+        #     diff = value - self.yield_strength 
+        #     if diff < 0.05 * sig:
+        #         i = index
                 
 
         
-        # i =  find_index(self.stress, sig)
+        i =  find_index(array=self.stress, value=self.yield_strength)
 
         x = self.strain[i: ]
         y = self.stress[i: ]
 
+        
         return x, y
 
     def real_values(self):
@@ -575,25 +577,6 @@ class Tensile_test:
             plt.savefig(save_path, dpi = 300, bbox_inches = 'tight', transparent = False)
         
         plt.show()
-
-    def diff_flow_model(self):
-
-        x, y = self.plastic_deformation()
-
-        dx = np.gradient(x)
-        dy = np.gradient(y)
-
-        diff = dy/dx
-
-        smth_diff = savgol_filter(diff, window_length = 61, polyorder= 3)
-
-        plt.figure()
-        plt.plot(x, smth_diff)
-        plt.plot(x, y)
-        # plt.ylim(0, )
-        plt.yscale('linear')
-        plt.show()
-        
 
 
     def summary(self):
