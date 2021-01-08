@@ -68,9 +68,8 @@ class Tensile_test:
             self.strain = x/crossec_area
 
         self.path = f'{self.name}_output'
-        create_output_folder(path = self.path)
-
-
+        create_output_folder(path=self.path)
+        
     @property
     def young_modulus(self):
         # taking only the elastic portion of a curve
@@ -82,6 +81,7 @@ class Tensile_test:
         model = curve_fit(Hooke, x, y, p0 = init_guess)
         ans, *_ = model
         E_mpa, intercept = ans
+        fit_curve = E_mpa * x + intercept
         E_gpa = round(E_mpa / 1000)
 
         # calculating the R_squared statistic
@@ -236,10 +236,19 @@ class Tensile_test:
 
     def plastic_deformation(self):
 
-        yield_index =  find_index(self.stress, self.yield_strength)
+        sig = (self.yield_strength + self.UTS / 2)
 
-        x = self.strain[yield_index: ]
-        y = self.stress[yield_index: ]
+        for index, value in enumerate(self.stress):
+            diff = value - self.yield_strength 
+            if diff < 0.05 * sig:
+                i = index
+                
+
+        
+        # i =  find_index(self.stress, sig)
+
+        x = self.strain[i: ]
+        y = self.stress[i: ]
 
         return x, y
 
@@ -287,6 +296,8 @@ class Tensile_test:
             ans, *_ = model_fit
             Kexp, nexp = ans
 
+            sig_h = Hollomon(x, K = Kexp, n = nexp)
+
             R2 = r_squared(x, y, Hollomon, ans)
 
             return nexp, Kexp, R2
@@ -300,6 +311,8 @@ class Tensile_test:
             ans, *_ = model_fit
             sig_0, K, n = ans
 
+            sig_h = Ludwik(x, sig_o = sig_0, K = K, n = n)
+
             R2 = r_squared(x, y, Ludwik, ans)
 
             return sig_0, K, n, R2
@@ -312,6 +325,8 @@ class Tensile_test:
 
             ans, *_ = model_fit
             K, sig_0, n = ans
+
+            sig_h = Datsko(x, K = K, x0 = sig_0, n = n)
 
             R2 = r_squared(x, y, Datsko, ans)
 
@@ -401,10 +416,11 @@ class Tensile_test:
         Figure. 
         '''
 
-        E_mpa, _, intercept, _ = self.young_modulus
+        E_mpa, E_gpa, intercept, r2 = self.young_modulus
 
         x = self.strain[self.strain < 0.05]
         k = x - 0.002
+        z = Hooke(k, E_mpa)
 
         plt.figure(figsize = (8,4.5))
         plt.plot(self.strain, self.stress, 'b-', label = self.name)
