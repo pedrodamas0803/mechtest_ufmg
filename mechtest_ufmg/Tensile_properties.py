@@ -591,4 +591,3 @@ class Tensile_test:
                 
                 writer = csv.writer(csvfile)
                 writer.writerows(summ)
-
