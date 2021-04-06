@@ -320,7 +320,7 @@ class Tensile_test:
             return sig_0, K, n, R2
 
 
-    def plot_conventional_curve(self, save = False):
+    def plot_conventional_curve(self, save = False, **kwargs):
 
         '''
         Plots and displays the engineering stress/strain curve for the provided data.
@@ -334,13 +334,33 @@ class Tensile_test:
         The engineering stress/strain curve. 
         '''
 
+        if "color" in kwargs:
+            plot_color = kwargs.get("color")
+        else:
+            plot_color = "blue"
+
+        if "label" in kwargs:
+            plot_label = kwargs.get("label")
+        else:
+            plot_label = self.name
+        
+        if "title" in kwargs:
+            plot_title = kwargs.get("title")
+        else:
+            plot_title = 'Engineering stress/strain curve'
+
+        # if "xlims" in kwargs:
+        #     plot_xlim = kwargs.get("xlims")
+        
+            
+
         plt.figure(figsize=(8, 4.5), edgecolor = 'white', facecolor = 'white')
-        plt.plot(self.strain, self.stress, color = 'blue', label = self.name)
+        plt.plot(self.strain, self.stress, color = plot_color, label = plot_label)
         plt.xlabel('strain [mm/mm]')
         plt.ylabel(f'stress[{self.stress_unit}]')
         plt.xlim(0, 1.05 * max(self.strain))
         plt.ylim(0, 1.05 * max(self.stress))
-        plt.title('Engineering stress/strain curve')
+        plt.title(plot_title)
         plt.legend(fontsize=12, loc = 'lower right', frameon = False)
 
         if save == True:

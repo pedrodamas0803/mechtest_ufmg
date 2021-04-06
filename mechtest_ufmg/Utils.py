@@ -93,5 +93,4 @@ def create_output_folder(path = 'output'):
 
         if not os.path.exists(path):
             os.mkdir(path)
-        else:
-            print('The path already exists.')
+        

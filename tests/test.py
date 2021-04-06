@@ -20,7 +20,7 @@ astm1055 = Tensile_test(strain, stress, specimen_name='ASTM 1055')
 
 # astm1055.plot_true_curve(save = True)
 
-# astm1055.plot_conventional_curve(save = True)
+astm1055.plot_conventional_curve()
 
 # astm1055.plot_flow_model(model = 'Datsko', save = True)
 
