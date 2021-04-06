@@ -212,6 +212,11 @@ class Tensile_test:
         
         return mat_toughness
 
+    @property
+    def ductility(self):
+
+        return max(self.strain)
+
     def uniform_deformation(self):
         # TODO: deal with discontinuous yielding; how can I determine where it ends?
 
@@ -329,7 +334,7 @@ class Tensile_test:
         The engineering stress/strain curve. 
         '''
 
-        plt.figure(figsize=(8, 4.5))
+        plt.figure(figsize=(8, 4.5), edgecolor = 'white', facecolor = 'white')
         plt.plot(self.strain, self.stress, color = 'blue', label = self.name)
         plt.xlabel('strain [mm/mm]')
         plt.ylabel(f'stress[{self.stress_unit}]')
@@ -404,7 +409,7 @@ class Tensile_test:
         k = x - 0.002
         z = Hooke(k, E_mpa)
 
-        plt.figure(figsize = (8,4.5))
+        plt.figure(figsize = (8,4.5), edgecolor = 'white', facecolor = 'white')
         plt.plot(self.strain, self.stress, 'b-', label = self.name)
         plt.plot(x, Hooke(x, E_mpa, intercept), 'r--', linewidth = 1, label = 'Hooke\'s law' )
         plt.plot(x, Hooke(k, E_mpa), 'r:', linewidth = 1 )
@@ -440,7 +445,7 @@ class Tensile_test:
 
         yield_index = find_index(self.stress, self.yield_strength)
 
-        plt.figure(figsize = (8,4.5))
+        plt.figure(figsize = (8,4.5), edgecolor = 'white', facecolor = 'white')
         plt.plot(self.strain[yield_index: ], self.stress[yield_index: ],
                  color = 'blue', label = self.name)
         plt.xlabel('strain [mm/mm]')
@@ -473,7 +478,7 @@ class Tensile_test:
 
         x, y = self.real_values()
 
-        plt.figure(figsize=(8, 4.5))
+        plt.figure(figsize=(8, 4.5), edgecolor = 'white', facecolor = 'white')
         plt.plot(x, y, color = 'blue', label = self.name)
         plt.xlabel('true strain [mm/mm]')
         plt.ylabel(f'true stress [{self.stress_unit}]')
@@ -510,7 +515,7 @@ class Tensile_test:
 
         x, y = self.real_values()
 
-        plt.figure(figsize = (8, 4.5))
+        plt.figure(figsize = (8, 4.5), edgecolor = 'white', facecolor = 'white')
         plt.plot(x, y, color = 'blue', label = self.name)
         
         if model == 'Hollomon':
@@ -576,7 +581,8 @@ class Tensile_test:
                 ('Approx. resilience [MJ/m³]', round(self.approx_resilience, 3)),
                 ('Resilience [MJ/m³]', round(self.resilience, 3)),
                 ('Approx. toughness [MJ/m³]', round(self.toughness, 3)),
-                ('Toughness [MJ/m³]', round(self.toughness, 3))]
+                ('Toughness [MJ/m³]', round(self.toughness, 3)),
+                ('Ductility [%elongation]', round(100 * self.ductility, 1))]
 
         if os.path.exists(save_path):
 
@@ -591,3 +597,4 @@ class Tensile_test:
                 
                 writer = csv.writer(csvfile)
                 writer.writerows(summ)
+       
