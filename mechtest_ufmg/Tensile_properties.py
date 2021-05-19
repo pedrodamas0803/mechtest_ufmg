@@ -7,13 +7,13 @@ import os
 import csv
 # from mechtest_ufmg.Utils import *
 # Conversion factor from psi to MPa
-psi_to_mpa = 0.00689476
+PSI_TO_MPA = 0.00689476
 
 class Tensile_test:
     '''
     Tensile_test
 
-    This function will receive you data and create an object with your data entries.
+    This class will receive your data and create an object with your data entries.
     UNITS: The expected measurements units of the data are mm/mm² for length/area sizes, and MPa/Newton for stress/load.
             All math will be performed according to international standards units.
 
@@ -41,7 +41,7 @@ class Tensile_test:
         if stress_unit not in ['MPa', 'psi']:
             raise ValueError("stress unit must be 'MPa' or 'psi'." )
         elif stress_unit == 'psi' and is_stress == True:
-            y = y * psi_to_mpa
+            y = y * PSI_TO_MPA
             
         if is_strain != True and specimen_length.isnumeric() != True:
             raise ValueError('Specimen length must be provided if is_strain == False')
